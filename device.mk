@@ -27,6 +27,13 @@ PRODUCT_PACKAGES += \
     fstab.qcom \
     fstab.qcom.ramdisk
 
+# guacamole_pdc_probe (Phase B, userdebug/eng dev tool only - see
+# device/oneplus/guacamole/pdc_probe/PHASE_B_FINDINGS.md). Deliberately
+# added only here, not in sm8150-common's device.mk, so sibling devices
+# on this platform do not pick it up.
+PRODUCT_PACKAGES_DEBUG += \
+    guacamole_pdc_probe
+
 # Fastboot
 TARGET_BOARD_FASTBOOT_INFO_FILE := $(LOCAL_PATH)/fastboot-info.txt
 

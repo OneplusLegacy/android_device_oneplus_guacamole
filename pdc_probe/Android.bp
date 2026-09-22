@@ -1,0 +1,64 @@
+// guacamole_pdc_probe - Phase B read-only QMI PDC observation tool.
+// See PHASE_B_FINDINGS.md and README.md in this directory before building
+// or wiring this into any product target.
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+cc_binary {
+    name: "guacamole_pdc_probe",
+    vendor: true,
+    // Deliberately NOT in any init .rc as a "class hal"/daemon - this is
+    // a manually-invoked, one-shot CLI tool for Phase B observation, per
+    // the explicit instruction not to add a persistent service yet.
+    srcs: [
+        "src/main.cpp",
+        "src/pdc_wire.cpp",
+        "src/pdc_client.cpp",
+        "src/qcci_shim.cpp",
+    ],
+    local_include_dirs: ["include"],
+    shared_libs: [
+        "libc",
+        "libc++",
+        // Both are real cc_prebuilt_library_shared modules already in
+        // vendor/oneplus/sm8150-common/Android.bp (libqmi_cci at line
+        // 2051, libqmiservices at line 2362 as of this writing) - see
+        // include/qcci_shim.h for why these two specifically (not
+        // libqcci_legacy, which has no service-discovery function and
+        // no Android.bp module either).
+        "libqmi_cci",
+        "libqmiservices",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
+
+cc_test_host {
+    name: "guacamole_pdc_probe_test",
+    srcs: [
+        "tests/qmi_tlv_test.cpp",
+        "tests/pdc_wire_test.cpp",
+        "src/pdc_wire.cpp",
+    ],
+    local_include_dirs: ["include"],
+    static_libs: [
+        "libgtest",
+        "libgtest_main",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+    test_suites: ["general-tests"],
+    // Deliberately does NOT depend on qcci_shim.cpp/pdc_client.cpp: those
+    // touch real vendor .so files via dlopen and cannot run on a build
+    // host. Only the transport-independent TLV codec and PDC message
+    // codec (pdc_wire.cpp) are exercised here - see PHASE_B_FINDINGS.md
+    // for what is and isn't covered by this test target.
+}

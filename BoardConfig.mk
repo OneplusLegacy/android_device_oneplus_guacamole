@@ -9,6 +9,10 @@ include device/oneplus/sm8150-common/BoardConfigCommon.mk
 
 DEVICE_PATH := device/oneplus/guacamole
 
+# guacamole_pdc_probe (Phase B) sepolicy - guacamole-only, not shared with
+# sm8150-common siblings. See PHASE_B_FINDINGS.md.
+include $(DEVICE_PATH)/sepolicy/SEPolicy.mk
+
 # Display
 TARGET_SCREEN_DENSITY := 560
 

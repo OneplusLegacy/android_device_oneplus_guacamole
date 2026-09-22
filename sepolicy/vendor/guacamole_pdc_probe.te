@@ -1,0 +1,57 @@
+# guacamole_pdc_probe - Phase B read-only QMI PDC observation tool.
+#
+# Scope discipline: this domain gets ONLY what List Configs / Get Config
+# Info actually need - QRTR/QMUX client transport and permission for the
+# dynamic linker to open/map the two vendor libraries it's linked
+# against (libqmi_cci.so, libqmiservices.so - real Android.bp modules,
+# linked normally via `shared_libs`, not dlopen). It does NOT get
+# vendor_diag_device access (PDC over QRTR does not need /dev/diag at
+# all - that's a separate, unrelated DIAG transport this probe never
+# touches), and it does NOT get any EFS-adjacent permission.
+#
+# Wrapped in userdebug_or_eng() throughout: per the Phase B plan, this is
+# a developer-invoked CLI tool, installed only on userdebug/eng builds
+# for now. A "user" build that wants to expose the same capability
+# through a real UI would need a proper Binder/HAL-mediated design (see
+# REVIEW.md's point about userdebug precedent not being user-build
+# evidence) - do not just delete this wrapper to "make it work" on user
+# builds without that redesign.
+
+type guacamole_pdc_probe, domain;
+type guacamole_pdc_probe_exec, exec_type, vendor_file_type, file_type;
+
+userdebug_or_eng(`
+  # adb shell -> guacamole_pdc_probe domain transition on exec.
+  domain_auto_trans(shell, guacamole_pdc_probe_exec, guacamole_pdc_probe)
+  allow shell guacamole_pdc_probe:process { signull sigkill };
+
+  # Baseline process/file hygiene for a short-lived CLI domain.
+  allow guacamole_pdc_probe self:process { fork sigchld };
+  allow guacamole_pdc_probe guacamole_pdc_probe_exec:file { execute open read getattr map };
+  allow guacamole_pdc_probe vendor_file:file { open read getattr map execute };
+
+  # QRTR/QMUX client transport: the exact same grant ims/location/
+  # thermal-engine/wcnss_service/qti/netmgrd/etc. already hold in
+  # production (non-debug-gated) policy in
+  # device/qcom/sepolicy_vndr/legacy-um/generic/vendor/common/te_macros
+  # - see research_pixelos_qmi_pdc_analysis.md item 4. This is the
+  # lowest-risk, best-precedented grant in this whole design.
+  qmux_socket(guacamole_pdc_probe)
+
+  # Linked shared libraries: libqmi_cci.so, libqmiservices.so (linked via
+  # Android.bp `shared_libs`, resolved by the dynamic linker at process
+  # start - not dlopen). ASSUMPTION FLAGGED, NOT CONFIRMED: these two
+  # .so files are assumed to carry the same `same_process_hal_file`
+  # label libdiag.so has (per Codex REVIEW.md's confirmed file_contexts
+  # citation for libdiag.so), since Qualcomm's common file_contexts
+  # template tends to label the whole vendor/lib{,64}/*.so HAL-adjacent
+  # set this way. This has NOT been independently verified for
+  # libqmi_cci.so/libqmiservices.so specifically. FIRST ON-DEVICE STEP:
+  # run
+  #   ls -Z /vendor/lib64/libqmi_cci.so /vendor/lib64/libqmiservices.so
+  # and prune this allow rule if the real label turns out to already be
+  # covered by the more general `vendor_file:file` grant above (in which
+  # case this line is redundant), or correct it to the real type if
+  # neither matches.
+  allow guacamole_pdc_probe same_process_hal_file:file { execute open read getattr map };
+')

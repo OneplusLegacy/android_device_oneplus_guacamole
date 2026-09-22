@@ -1,2 +1,13 @@
 soong_namespace {
+    imports: [
+        // guacamole_pdc_probe (device/oneplus/guacamole/pdc_probe) links
+        // against libqmi_cci/libqmiservices, which are real
+        // cc_prebuilt_library_shared modules defined in
+        // vendor/oneplus/sm8150-common/Android.bp's own namespace.
+        // Soong namespace imports are not transitive - guacamole's own
+        // namespace must import it directly to see those modules, even
+        // though vendor/oneplus/guacamole already imports it separately
+        // for its own (unrelated) prebuilts.
+        "vendor/oneplus/sm8150-common",
+    ],
 }
