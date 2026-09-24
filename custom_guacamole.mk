@@ -15,6 +15,9 @@ $(call inherit-product, device/oneplus/guacamole/device.mk)
 # Inherit some common PixelOS stuff.
 $(call inherit-product, vendor/custom/config/common_full_phone.mk)
 
+# Inherit BCR
+$(call inherit-product, vendor/bcr/bcr.mk)
+
 # Device identifier. This must come after all inclusions.
 PRODUCT_NAME := custom_guacamole
 PRODUCT_DEVICE := guacamole
