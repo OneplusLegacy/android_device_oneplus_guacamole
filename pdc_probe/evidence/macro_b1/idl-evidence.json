@@ -1,0 +1,32 @@
+{
+  "binaries": {
+    "/home/ccc/dumpyara/working/oneplus7profirmware/vendor/lib64/libril-qc-hal-qmi.so": "492cf327e70532122e0fcb1a16fd26798dd4dbb396de1efd47082112de109fbe",
+    "/home/ccc/dumpyara/working/oneplus7profirmware/vendor/lib64/libqmiservices.so": "b6cb88ce12a7010ab4e9eb178c005d6733c45b7747c1d8a6bf70ffbb43133975"
+  },
+  "service_object_va": "0x25708",
+  "service_object_file_offset": "0x24708",
+  "message_id": "0x2e",
+  "definitions": [
+    {
+      "kind": "request",
+      "message_table_index": 41,
+      "c_struct_size": 80,
+      "descriptor_offset": "0xf1c3",
+      "descriptor_hex": "0102004410020844110210441202184113001d421402204415022844160230441702384418024042190146421a014ac21b014e"
+    },
+    {
+      "kind": "response",
+      "message_table_index": 42,
+      "c_struct_size": 8,
+      "descriptor_offset": "0xf1f6",
+      "descriptor_hex": "8207000001"
+    },
+    {
+      "kind": "indication",
+      "message_table_index": 43,
+      "c_struct_size": 12,
+      "descriptor_offset": "0xf1fb",
+      "descriptor_hex": "010500c4100208"
+    }
+  ]
+}

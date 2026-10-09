@@ -23,7 +23,27 @@ type guacamole_pdc_probe_exec, exec_type, vendor_file_type, file_type;
 userdebug_or_eng(`
   # adb shell -> guacamole_pdc_probe domain transition on exec.
   domain_auto_trans(shell, guacamole_pdc_probe_exec, guacamole_pdc_probe)
-  allow shell guacamole_pdc_probe:process { signull sigkill };
+  # init is explicitly permitted to execute vendor entrypoints by Treble.
+  # su remains unable to execute the vendor probe through an explicit allow.
+  domain_auto_trans(init, guacamole_pdc_probe_exec, guacamole_pdc_probe)
+
+  # REMOVED 2026-09-24 W1 Finalization Round (real neverallow violation,
+  # found via a real selinux_policy build - not a 13T-shared-tree issue,
+  # this is guacamole own file): the line used to be
+  #   allow shell guacamole_pdc_probe:process { signull sigkill };
+  # system/sepolicy/private/app.te has a real, AOSP-wide neverallow:
+  #   neverallow appdomain base_typeattr_295 (process (sigkill sigstop signal));
+  # and shell carries the appdomain attribute in this AOSP version, so
+  # this grant is structurally disallowed platform-wide, not something
+  # this project can special-case around. This was a debug convenience
+  # (letting adb shell directly signal-kill a stuck one-shot CLI run)
+  # that this domain does not actually need: guacamole_pdc_probe is a
+  # short-lived, manually-invoked CLI tool, not a persistent daemon, and
+  # a stuck foreground run can still be interrupted the ordinary way
+  # (Ctrl-C/SIGINT through the invoking shell own job control, which
+  # never needed this cross-domain signal permission in the first
+  # place), or killed from the su/root domain if truly stuck, which
+  # this neverallow does not restrict.
 
   # Baseline process/file hygiene for a short-lived CLI domain.
   allow guacamole_pdc_probe self:process { fork sigchld };
@@ -37,21 +57,44 @@ userdebug_or_eng(`
   # - see research_pixelos_qmi_pdc_analysis.md item 4. This is the
   # lowest-risk, best-precedented grant in this whole design.
   qmux_socket(guacamole_pdc_probe)
+  allow guacamole_pdc_probe self:qipcrtr_socket create_socket_perms_no_ioctl;
 
   # Linked shared libraries: libqmi_cci.so, libqmiservices.so (linked via
-  # Android.bp `shared_libs`, resolved by the dynamic linker at process
+  # Android.bp shared_libs, resolved by the dynamic linker at process
   # start - not dlopen). ASSUMPTION FLAGGED, NOT CONFIRMED: these two
-  # .so files are assumed to carry the same `same_process_hal_file`
-  # label libdiag.so has (per Codex REVIEW.md's confirmed file_contexts
-  # citation for libdiag.so), since Qualcomm's common file_contexts
-  # template tends to label the whole vendor/lib{,64}/*.so HAL-adjacent
-  # set this way. This has NOT been independently verified for
-  # libqmi_cci.so/libqmiservices.so specifically. FIRST ON-DEVICE STEP:
-  # run
+  # .so files are assumed to carry the same same_process_hal_file
+  # label libdiag.so has (per the Codex review, REVIEW.md, confirming a
+  # file_contexts citation for libdiag.so), since Qualcomm common
+  # file_contexts templates tend to label the whole vendor/lib{,64}/*.so
+  # HAL-adjacent set this way. This has NOT been independently verified
+  # for libqmi_cci.so/libqmiservices.so specifically. FIRST ON-DEVICE
+  # STEP: run
   #   ls -Z /vendor/lib64/libqmi_cci.so /vendor/lib64/libqmiservices.so
   # and prune this allow rule if the real label turns out to already be
-  # covered by the more general `vendor_file:file` grant above (in which
+  # covered by the more general vendor_file:file grant above (in which
   # case this line is redundant), or correct it to the real type if
   # neither matches.
+  #
+  # 2026-09-24 W1 Finalization Round build fix: this comment block used
+  # to mix markdown-style backtick and apostrophe quoting - since this
+  # whole block is itself the quoted argument to the userdebug_or_eng
+  # m4 macro (opened with a backtick, closed with a single quote below),
+  # every stray backtick or apostrophe inside it shifts m4 own quote
+  # nesting depth, even inside a hash comment. The real selinux_policy
+  # build surfaced this directly with an m4 end of file in string error,
+  # because 7 backticks versus 2 apostrophes never balanced back to
+  # zero before the file ended. Fixed by removing every backtick and
+  # apostrophe character from this block comments - no policy or
+  # semantic change.
   allow guacamole_pdc_probe same_process_hal_file:file { execute open read getattr map };
 ')
+
+# B.3 manual experiment journal only. Separate from production EFS storage.
+type guacamole_pdc_experiment_data_file, file_type, data_file_type;
+userdebug_or_eng(`
+  allow guacamole_pdc_probe guacamole_pdc_experiment_data_file:dir { search open read getattr write add_name };
+  allow guacamole_pdc_probe guacamole_pdc_experiment_data_file:file { create open read write getattr lock };
+')
+# No unlink/remove_name/rename permission: attempts are never auto-cleared.
+
+# Manual init control ownership and caller permissions are in system_ext/private.

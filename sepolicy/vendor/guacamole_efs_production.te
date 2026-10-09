@@ -1,0 +1,24 @@
+type guacamole_efs_worker, domain;
+type guacamole_efs_worker_exec, exec_type, vendor_file_type, file_type;
+domain_auto_trans(guacamole_efsd, guacamole_efs_worker_exec, guacamole_efs_worker)
+allow guacamole_efsd guacamole_efs_worker:process { sigkill sigchld };
+allow guacamole_efs_worker guacamole_efsd:fd use;
+allow guacamole_efs_worker guacamole_efsd:fifo_file { read write getattr };
+allow guacamole_efs_worker guacamole_efsd_data_file:dir search;
+allow guacamole_efs_worker guacamole_efsd_journal_file:dir { search open read getattr write add_name };
+allow guacamole_efs_worker guacamole_efsd_journal_file:file { create open read write getattr lock };
+allow guacamole_efs_worker vendor_diag_device:chr_file { read write open ioctl getattr };
+allow guacamole_efs_worker same_process_hal_file:file { execute open read getattr map };
+# Evidence authority has no modem/DIAG/Binder access and no journal write grants.
+type guacamole_efs_evidence, domain;
+type guacamole_efs_evidence_exec, exec_type, vendor_file_type, file_type;
+type guacamole_efs_evidence_socket, file_type;
+init_daemon_domain(guacamole_efs_evidence)
+allow guacamole_efs_evidence self:unix_stream_socket create_stream_socket_perms;
+allow guacamole_efs_evidence guacamole_efs_experiment_data_file:dir { search open read getattr };
+allow guacamole_efs_evidence guacamole_efs_experiment_data_file:file { open read getattr lock };
+allow guacamole_efs_evidence guacamole_pdc_experiment_data_file:dir { search open read getattr };
+allow guacamole_efs_evidence guacamole_pdc_experiment_data_file:file { open read getattr };
+allow guacamole_efsd self:unix_stream_socket create_stream_socket_perms;
+allow guacamole_efsd guacamole_efs_evidence_socket:sock_file write;
+allow guacamole_efsd guacamole_efs_evidence:unix_stream_socket connectto;

@@ -1,6 +1,7 @@
-// guacamole_pdc_probe - Phase B read-only QMI PDC observation tool.
-// See PHASE_B_FINDINGS.md and README.md in this directory before building
-// or wiring this into any product target.
+// guacamole_pdc_probe - Phase B/B2 (read-only) + Phase C0 (one gated
+// write) QMI PDC observation/provisioning tool. See PHASE_B_FINDINGS.md
+// and PHASE_C0_FINDINGS.md in this directory before building or wiring
+// this into any product target.
 
 package {
     default_applicable_licenses: ["Android-Apache-2.0"],
@@ -10,15 +11,22 @@ cc_binary {
     name: "guacamole_pdc_probe",
     vendor: true,
     // Deliberately NOT in any init .rc as a "class hal"/daemon - this is
-    // a manually-invoked, one-shot CLI tool for Phase B observation, per
-    // the explicit instruction not to add a persistent service yet.
+    // a manually-invoked, one-shot CLI tool for Phase B/B2/C0 dev
+    // testing, per the explicit instruction not to add a persistent
+    // service yet.
     srcs: [
         "src/main.cpp",
         "src/pdc_wire.cpp",
+        "src/pdc_load_wire.cpp",
+        "src/pdc_select_config_wire.cpp",
         "src/pdc_client.cpp",
         "src/qcci_shim.cpp",
+        "src/hash.cpp",
+        "src/known_profiles.cpp",
+        "src/skt_load.cpp",
     ],
     local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
     shared_libs: [
         "libc",
         "libc++",
@@ -38,14 +46,116 @@ cc_binary {
     ],
 }
 
+// Manual experiment only. Product packaging is guacamole debug-only; even a
+// manually built user variant has a disabled entry point. No init/Binder hook.
+cc_binary {
+    name: "guacamole_pdc_mapping_probe",
+    vendor: true,
+    srcs: [
+        "src/experiment_environment.cpp",
+        "src/mapping_main.cpp",
+        "src/mapping_experiment.cpp",
+        "src/mapping_transport.cpp",
+        "src/pdc_client.cpp",
+        "src/qcci_shim.cpp",
+        "src/pdc_wire.cpp",
+        "src/pdc_load_wire.cpp",
+        "src/pdc_select_config_wire.cpp",
+    ],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    shared_libs: ["libc", "libc++", "libbase", "libqmi_cci", "libqmiservices"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+    product_variables: {
+        debuggable: {
+            cflags: ["-DGUACAMOLE_MAPPING_DEBUG"],
+        },
+    },
+}
+
+// Macro A: separate manual carrier experiments, never a daemon dependency.
+cc_binary {
+    name: "guacamole_pdc_carrier_probe",
+    init_rc: ["init/guacamole_pdc_experiment.rc"],
+    vendor: true,
+    srcs: [
+        "src/experiment_environment.cpp",
+        "src/experiment_context.cpp",
+        "src/init_experiment_report.cpp",
+        "src/carrier_main.cpp",
+        "src/auto_slot0_device.cpp",
+        "src/carrier_experiment.cpp",
+        "src/presence_diagnostics.cpp",
+        "src/auto_selection_experiment.cpp",
+        "src/feature_readonly.cpp",
+        "src/auto_slot0_experiment.cpp",
+        "src/auto_feature_set.cpp",
+        "src/auto_experiment_journal.cpp",
+        "src/carrier_file.cpp",
+        "src/carrier_transport.cpp",
+        "src/mapping_experiment.cpp",
+        "src/known_profiles.cpp",
+        "src/hash.cpp",
+        "src/pdc_client.cpp",
+        "src/qcci_shim.cpp",
+        "src/pdc_wire.cpp",
+        "src/pdc_load_wire.cpp",
+        "src/pdc_select_config_wire.cpp",
+    ],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    shared_libs: ["libc", "libc++", "libbase", "libselinux", "libqmi_cci", "libqmiservices"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+    product_variables: {
+        debuggable: { cflags: ["-DGUACAMOLE_CARRIER_DEBUG"] },
+    },
+}
+
 cc_test_host {
     name: "guacamole_pdc_probe_test",
     srcs: [
+        "src/experiment_environment.cpp",
+        "src/experiment_context.cpp",
+        "src/init_experiment_report.cpp",
+        "tests/experiment_environment_test.cpp",
+        "tests/experiment_context_test.cpp",
+        "tests/init_experiment_report_test.cpp",
+        "tests/carrier_experiment_test.cpp",
+        "tests/presence_diagnostics_test.cpp",
+        "tests/auto_selection_experiment_test.cpp",
+        "tests/feature_readonly_test.cpp",
+        "tests/auto_slot0_experiment_test.cpp",
+        "tests/auto_feature_set_test.cpp",
+        "tests/auto_experiment_journal_test.cpp",
+        "src/carrier_experiment.cpp",
+        "src/presence_diagnostics.cpp",
+        "src/auto_selection_experiment.cpp",
+        "src/feature_readonly.cpp",
+        "src/auto_slot0_experiment.cpp",
+        "src/auto_feature_set.cpp",
+        "src/auto_experiment_journal.cpp",
+        "src/carrier_file.cpp",
+        "src/carrier_transport.cpp",
+        "tests/mapping_experiment_test.cpp",
+        "src/mapping_experiment.cpp",
+        "src/mapping_transport.cpp",
+        "tests/pdc_client_test.cpp",
+        "src/pdc_client.cpp",
         "tests/qmi_tlv_test.cpp",
         "tests/pdc_wire_test.cpp",
+        "tests/hash_test.cpp",
+        "tests/skt_load_test.cpp",
+        "tests/known_profiles_test.cpp",
+        "tests/pdc_select_config_wire_test.cpp",
         "src/pdc_wire.cpp",
+        "src/pdc_load_wire.cpp",
+        "src/pdc_select_config_wire.cpp",
+        "src/hash.cpp",
+        "src/known_profiles.cpp",
+        "src/skt_load.cpp",
     ],
     local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
     static_libs: [
         "libgtest",
         "libgtest_main",
@@ -56,9 +166,28 @@ cc_test_host {
         "-Werror",
     ],
     test_suites: ["general-tests"],
-    // Deliberately does NOT depend on qcci_shim.cpp/pdc_client.cpp: those
-    // touch real vendor .so files via dlopen and cannot run on a build
-    // host. Only the transport-independent TLV codec and PDC message
-    // codec (pdc_wire.cpp) are exercised here - see PHASE_B_FINDINGS.md
-    // for what is and isn't covered by this test target.
+    // pdc_client.cpp uses injected IQcciShim in routing tests. The vendor
+    // constructor/symbols remain in qcci_shim.cpp, excluded from this target.
+}
+
+// Only the Macro C experiment links this library. Its transport guards permit
+// exact GetSelected/GetInfo/GetFeature; no carrier mutation permit is present.
+cc_library_static {
+    name: "guacamole_w1_pdc_readonly",
+    vendor: true,
+    srcs: ["src/w1_pdc_readonly.cpp", "src/feature_readonly.cpp", "src/auto_selection_experiment.cpp", "src/pdc_client.cpp",
+           "src/qcci_shim.cpp", "src/pdc_wire.cpp", "src/pdc_load_wire.cpp", "src/pdc_select_config_wire.cpp"],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    export_include_dirs: ["include"],
+    shared_libs: ["libqmi_cci", "libqmiservices"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+
+cc_library_static {
+ name: "guacamole_production_pdc", vendor: true,
+ srcs: ["src/feature_readonly.cpp", "src/auto_selection_experiment.cpp", "src/pdc_client.cpp", "src/qcci_shim.cpp", "src/pdc_wire.cpp", "src/pdc_load_wire.cpp", "src/pdc_select_config_wire.cpp"],
+ local_include_dirs: ["include"], export_include_dirs: ["include"],
+ shared_libs: ["libqmi_cci", "libqmiservices"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
 }

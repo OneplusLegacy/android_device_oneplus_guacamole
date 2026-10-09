@@ -1,0 +1,10 @@
+ifelse(guacamole_debug_contexts, `true', `
+ctl.start$vendor.guacamole-pdc-context u:object_r:guacamole_pdc_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-pdc-feature0 u:object_r:guacamole_pdc_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-pdc-feature1 u:object_r:guacamole_pdc_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-pdc-selected u:object_r:guacamole_pdc_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-pdc-auto0-enable-once u:object_r:guacamole_pdc_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-efs-inspect u:object_r:guacamole_efs_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-efs-apply-once u:object_r:guacamole_efs_ctl_prop:s0 exact string
+ctl.start$vendor.guacamole-efs-rollback-once u:object_r:guacamole_efs_ctl_prop:s0 exact string
+', `')

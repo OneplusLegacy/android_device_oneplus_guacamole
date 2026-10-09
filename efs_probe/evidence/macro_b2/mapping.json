@@ -1,0 +1,169 @@
+{
+  "baseline_sha256": "b81f1d34e8279547c789b6665e82db41a07d53451ea7a15bed7e628eb829f155",
+  "size": 57655,
+  "record_count": 128,
+  "repeated_indices": {
+    "36": 7,
+    "67": 2,
+    "82": 2,
+    "31": 11,
+    "4": 9,
+    "12": 3,
+    "238": 3,
+    "11": 2,
+    "42": 2,
+    "69": 2
+  },
+  "generation_only_mapping": {
+    "LGU": 38,
+    "SKT": 39,
+    "KT": 40
+  },
+  "reported_runtime_versions": {
+    "LGU": "0x08012608",
+    "SKT": "0x0801270a",
+    "KT": "0x08012800"
+  },
+  "state": "CONFIRMED_FOR_SEL_DB_GENERATION",
+  "network_e2e_not_implied": true,
+  "old_list_comparison": "PRE_LOAD_FULL_LIST_NOT_AVAILABLE",
+  "runtime_inventory": "/home/ccc/\ubc14\ud0d5\ud654\uba74/claude/guacamole_efs_phased0/mapping-captures/20261004-160938-pdc-index-inventory",
+  "verified_local_profiles": [
+    {
+      "source": "info-3a87a2ce830826e7de1f1a8cb2faf5012b4b71bc.txt",
+      "source_sha256": "c5cb6d88eda46ce80eadac90004b6655077339f52a8559af067f280ddadf0057",
+      "id": "3a87a2ce830826e7de1f1a8cb2faf5012b4b71bc",
+      "description": "Commercial-LGU",
+      "version": 134293000,
+      "hex_version": "0x8012608",
+      "carrier_byte": 38
+    },
+    {
+      "source": "info-79bd2e28f61310fd538c0a5b9bcbd19f143da762.txt",
+      "source_sha256": "f263e7cb7957d644ff78eda5e6513be613dbb78c984f68e8c9b3c9fba39a53a0",
+      "id": "79bd2e28f61310fd538c0a5b9bcbd19f143da762",
+      "description": "Commercial-KT",
+      "version": 134293504,
+      "hex_version": "0x8012800",
+      "carrier_byte": 40
+    },
+    {
+      "source": "info-729828b1c3724e0e83c4994de882306cfec0a7ee.txt",
+      "source_sha256": "96a006058e1b002f6c509f430a3df341ee7cd1cec83b04d2299e3814abd12e2e",
+      "id": "729828b1c3724e0e83c4994de882306cfec0a7ee",
+      "description": "ICE_Norway",
+      "version": 134293504,
+      "hex_version": "0x8012800",
+      "carrier_byte": 40
+    },
+    {
+      "source": "info-1618938a9f433c91fe39973cbe59b38f59fa517f.txt",
+      "source_sha256": "378a342b881e1f59c2c47e42ccb6b94cff757a210ef571af2415d7f342bcafdd",
+      "id": "1618938a9f433c91fe39973cbe59b38f59fa517f",
+      "description": "Proximus_VoLTE",
+      "version": 134322185,
+      "hex_version": "0x8019809",
+      "carrier_byte": 152
+    },
+    {
+      "source": "info-e90becac950c944791a91393eabd9a8c6033574a.txt",
+      "source_sha256": "4549add05d22a68ed423683fbdc5633f631d8d057eadcd3d569d5eae6f5d97a0",
+      "id": "e90becac950c944791a91393eabd9a8c6033574a",
+      "description": "DNA_Finland",
+      "version": 134319119,
+      "hex_version": "0x8018c0f",
+      "carrier_byte": 140
+    },
+    {
+      "source": "info-ca9c9dcb8d6d2be6e4f6b49ca3e4b5420769a7d1.txt",
+      "source_sha256": "368f7599fbe6c722954bdb7cd56f72ca7b1f33759ae194dd83bb04b918346184",
+      "id": "ca9c9dcb8d6d2be6e4f6b49ca3e4b5420769a7d1",
+      "description": "Commercial-SKT",
+      "version": 134293258,
+      "hex_version": "0x801270a",
+      "carrier_byte": 39
+    }
+  ],
+  "muxd_observations": [
+    {
+      "name": "mcfg_sw_muxd_version_12",
+      "hex": "800c0108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_151",
+      "hex": "10970108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_154",
+      "hex": "019a0108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_241",
+      "hex": "17f10108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_242",
+      "hex": "33f20108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_39",
+      "hex": "0a270108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_65",
+      "hex": "11410108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_8",
+      "hex": "09080108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_12",
+      "hex": "800c0108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_151",
+      "hex": "10970108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_154",
+      "hex": "019a0108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_241",
+      "hex": "17f10108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_242",
+      "hex": "33f20108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_38",
+      "hex": "08260108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_65",
+      "hex": "11410108",
+      "suffix_matches_carrier_byte": true
+    },
+    {
+      "name": "mcfg_sw_muxd_version_Subscription01_8",
+      "hex": "09080108",
+      "suffix_matches_carrier_byte": true
+    }
+  ]
+}

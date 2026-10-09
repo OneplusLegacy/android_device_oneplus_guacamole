@@ -1,0 +1,4 @@
+typeattribute guacamole_efs_controller coredomain;
+app_domain(guacamole_efs_controller)
+binder_use(guacamole_efs_controller)
+# No net_domain, modem/device/data-journal or property-control grants.

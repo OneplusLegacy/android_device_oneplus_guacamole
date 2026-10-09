@@ -274,3 +274,120 @@ TEST(OperationResult, EmptySyncAckIsMalformedNotRejected) {
   uint16_t est = 0, ecode = 0;
   EXPECT_FALSE(ParseOperationResultOnly(nullptr, 0, &est, &ecode));
 }
+
+// --- Phase B2: Get Selected Config ---
+
+namespace {
+std::vector<uint8_t> BuildSelectedIndication(
+    uint32_t token, uint16_t err_status,
+    const std::optional<std::vector<uint8_t>>& active_id,
+    const std::optional<std::vector<uint8_t>>& pending_id) {
+  std::vector<uint8_t> body;
+  AppendTlvU32(&body, kTlvToken, token);
+  uint8_t err_le[2] = {static_cast<uint8_t>(err_status & 0xFF),
+                        static_cast<uint8_t>((err_status >> 8) & 0xFF)};
+  AppendTlv(&body, kTlvIndicationResult, err_le, 2);
+  if (active_id) {
+    AppendTlvU8PrefixedBytes(&body, kTlvGetSelectedConfigIndActiveId,
+                              active_id->data(), active_id->size());
+  }
+  if (pending_id) {
+    AppendTlvU8PrefixedBytes(&body, kTlvGetSelectedConfigIndPendingId,
+                              pending_id->data(), pending_id->size());
+  }
+  return body;
+}
+}  // namespace
+
+TEST(PdcWireSelected, ActiveOnly) {
+  std::vector<uint8_t> active = {0x0b, 0xd7, 0x1c};
+  auto body = BuildSelectedIndication(30, 0, active, std::nullopt);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 30);
+  ASSERT_TRUE(result.ok);
+  EXPECT_EQ(ClassifyGetSelectedConfigResult(result), IndicationOutcome::kSuccess);
+  ASSERT_TRUE(result.active_id.has_value());
+  EXPECT_EQ(*result.active_id, active);
+  EXPECT_FALSE(result.pending_id.has_value());
+}
+
+TEST(PdcWireSelected, PendingOnly) {
+  std::vector<uint8_t> pending = {0xaa, 0xbb};
+  auto body = BuildSelectedIndication(31, 0, std::nullopt, pending);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 31);
+  ASSERT_TRUE(result.ok);
+  EXPECT_FALSE(result.active_id.has_value());
+  ASSERT_TRUE(result.pending_id.has_value());
+  EXPECT_EQ(*result.pending_id, pending);
+}
+
+TEST(PdcWireSelected, ActiveAndPending) {
+  std::vector<uint8_t> active = {0x01};
+  std::vector<uint8_t> pending = {0x02, 0x03};
+  auto body = BuildSelectedIndication(32, 0, active, pending);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 32);
+  ASSERT_TRUE(result.ok);
+  ASSERT_TRUE(result.active_id.has_value());
+  ASSERT_TRUE(result.pending_id.has_value());
+  EXPECT_EQ(*result.active_id, active);
+  EXPECT_EQ(*result.pending_id, pending);
+}
+
+TEST(PdcWireSelected, NeitherPresentIsStillValidSuccess) {
+  // A device with no config selected yet at all is a legitimate state,
+  // not an error - both fields absent means NONE/NONE, not malformed.
+  auto body = BuildSelectedIndication(33, 0, std::nullopt, std::nullopt);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 33);
+  ASSERT_TRUE(result.ok);
+  EXPECT_EQ(ClassifyGetSelectedConfigResult(result), IndicationOutcome::kSuccess);
+  EXPECT_FALSE(result.active_id.has_value());
+  EXPECT_FALSE(result.pending_id.has_value());
+}
+
+TEST(PdcWireSelected, VariableLengthIdNotAssumed20Bytes) {
+  // Regression guard: do not assume a fixed 20-byte id just because the
+  // real device's Common-Commercial config happened to have one.
+  std::vector<uint8_t> long_active(kMaxIdLen, 0x7A);  // right at the cap
+  auto body = BuildSelectedIndication(34, 0, long_active, std::nullopt);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 34);
+  ASSERT_TRUE(result.ok);
+  ASSERT_TRUE(result.active_id.has_value());
+  EXPECT_EQ(result.active_id->size(), kMaxIdLen);
+
+  std::vector<uint8_t> short_active = {0x01};  // 1 byte, also valid
+  auto body2 = BuildSelectedIndication(35, 0, short_active, std::nullopt);
+  auto result2 = ParseGetSelectedConfigIndication(body2.data(), body2.size(), 35);
+  ASSERT_TRUE(result2.ok);
+  ASSERT_TRUE(result2.active_id.has_value());
+  EXPECT_EQ(result2.active_id->size(), 1u);
+}
+
+TEST(PdcWireSelected, MalformedActiveIdTlvRejected) {
+  std::vector<uint8_t> body;
+  AppendTlvU32(&body, kTlvToken, 36);
+  uint8_t err_le[2] = {0, 0};
+  AppendTlv(&body, kTlvIndicationResult, err_le, 2);
+  // Active Id TLV whose 1-byte size prefix (claims 10) exceeds the TLV's
+  // own outer length (only 3 bytes of value follow the prefix byte).
+  uint8_t bad_active[4] = {10, 1, 2, 3};
+  AppendTlv(&body, kTlvGetSelectedConfigIndActiveId, bad_active, sizeof(bad_active));
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 36);
+  EXPECT_FALSE(result.ok);
+  EXPECT_EQ(ClassifyGetSelectedConfigResult(result), IndicationOutcome::kMalformed);
+}
+
+TEST(PdcWireSelected, IndicationRejectedNotSuccess) {
+  auto body = BuildSelectedIndication(37, /*err_status=*/5, std::nullopt,
+                                       std::nullopt);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(), 37);
+  ASSERT_TRUE(result.ok);  // decoded fine...
+  EXPECT_EQ(ClassifyGetSelectedConfigResult(result),
+            IndicationOutcome::kRejected);  // ...but must not be kSuccess.
+}
+
+TEST(PdcWireSelected, WrongTokenRejected) {
+  auto body = BuildSelectedIndication(38, 0, std::nullopt, std::nullopt);
+  auto result = ParseGetSelectedConfigIndication(body.data(), body.size(),
+                                                  /*expected_token=*/39);
+  EXPECT_FALSE(result.ok);
+  EXPECT_EQ(ClassifyGetSelectedConfigResult(result), IndicationOutcome::kMalformed);
+}

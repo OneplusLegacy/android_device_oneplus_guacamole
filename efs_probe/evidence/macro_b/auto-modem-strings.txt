@@ -1,0 +1,16 @@
+1816cf3 /nv/item_files/mcfg/mcfg_autoselect_by_uim
+1816d1e /nv/item_files/mcfg/mcfg_autoselect_by_uim_Subscription01
+1816d58 /nv/item_files/mcfg/mcfg_autoselect_by_uim_Subscription02
+1816d92 /nv/item_files/mcfg/mcfg_setting
+1816db3 /nv/item_files/mcfg/mcfg_setting_Subscription01
+1816de3 /nv/item_files/mcfg/mcfg_setting_Subscription02
+1816fc8 mcfg_autoselect_by_uim
+1817168 mcfg_setting
+1819998 [%02lu.%03lu] Log: mcfg_restore_fact_def %d
+181febe [%02lu.%03lu] Log: pdc_send_set_selected_config_ind(): config_id.id_len=%lu
+181ff0b [%02lu.%03lu] Log: pdc_send_set_selected_config_ind(): config_id.id[0]=%d,config_id.id[1]=%d
+181ff69 [%02lu.%03lu] Log: pdc_send_set_selected_config_ind(): oppo_cnv_backup_nv success
+181ffbc [%02lu.%03lu] Log: pdc_send_set_selected_config_ind(): oppo_cnv_backup_nv fail
+18253b3 mcfg_setting
+18253c0 [%02lu.%03lu] Err: Couldn't write store %d of mcfg_settings for slot %d: status %d
+1825560 [%02lu.%03lu] Err: mcfg_setting_init - Failed to read NV for slot:%d, status: %d

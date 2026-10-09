@@ -1,0 +1,10 @@
+  2339: 0000000001d6c850  1736 FUNC    GLOBAL DEFAULT   14 qcril_qmi_pdc_deactivate_configuration_hdlr
+  2508: 0000000001d423f4   404 FUNC    GLOBAL DEFAULT   14 _Z15pdc_set_featureP27pdc_set_feature_req_msg_v01
+  5583: 0000000001d3fc8c   284 FUNC    GLOBAL DEFAULT   14 _Z28qmi_pdc_set_feature_ind_hdlrPvj
+  6446: 0000000001d699b8  1088 FUNC    GLOBAL DEFAULT   14 _Z35qcril_qmi_pdc_set_feature_ind_hndlrPvj
+  9800: 0000000001d68bbc  1820 FUNC    GLOBAL DEFAULT   14 _Z40qcril_qmi_pdc_deactivate_config_ind_hdlrPvj
+ 13538: 0000000001d6ebf4  1724 FUNC    GLOBAL DEFAULT   14 qcril_qmi_pdc_deactivate_configs
+ 14189: 0000000001d3f8f4   292 FUNC    GLOBAL DEFAULT   14 _Z34qmi_pdc_deactivate_config_ind_hdlrPvj
+ 15361: 0000000001d417ec   516 FUNC    GLOBAL DEFAULT   14 _Z21pdc_deactivate_configj24pdc_config_type_enum_v01
+ 21590: 0000000001d42588   244 FUNC    GLOBAL DEFAULT   14 _Z25pdc_enable_auto_selectionii
+ 21668: 0000000001d6c61c   564 FUNC    GLOBAL DEFAULT   14 qcril_qmi_pdc_deactivate_configuration

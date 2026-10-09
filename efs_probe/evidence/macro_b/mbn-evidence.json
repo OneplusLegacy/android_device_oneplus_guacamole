@@ -1,0 +1,34 @@
+{
+  "kt": {
+    "path": "/home/ccc/dumpyara/working/oneplus7profirmware/modem/image/modem_pr/mcfg/configs/mcfg_sw/generic/korea/kt/commerci/mcfg_sw.mbn",
+    "size": 39544,
+    "sha1": "79bd2e28f61310fd538c0a5b9bcbd19f143da762",
+    "sha256": "0305b51ca7446db9bb16e78964f6c6520739281c228ff596987d23484b9cd101",
+    "strings_evidence_only": [
+      {
+        "offset": "0x9a01",
+        "text": "MCFG_TRL"
+      },
+      {
+        "offset": "0x9a1f",
+        "text": "Commercial-KT"
+      }
+    ]
+  },
+  "lgu": {
+    "path": "/home/ccc/dumpyara/working/oneplus7profirmware/modem/image/modem_pr/mcfg/configs/mcfg_sw/generic/korea/lgu/commerci/mcfg_sw.mbn",
+    "size": 41088,
+    "sha1": "3a87a2ce830826e7de1f1a8cb2faf5012b4b71bc",
+    "sha256": "c84bcf76cb626debee291d6ee9b87e83b7c686070efe541c28d6ef46b84819b2",
+    "strings_evidence_only": [
+      {
+        "offset": "0xa007",
+        "text": "MCFG_TRL"
+      },
+      {
+        "offset": "0xa025",
+        "text": "Commercial-LGU"
+      }
+    ]
+  }
+}

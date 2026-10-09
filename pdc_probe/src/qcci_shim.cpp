@@ -1,4 +1,5 @@
 #include "qcci_shim.h"
+#include "pdc_client.h"
 
 // extern "C" prototypes for symbols this probe links against from
 // libqmi_cci.so / libqmiservices.so (see qcci_shim.h's file header for
@@ -29,6 +30,9 @@ int qmi_client_send_raw_msg_sync(guacamole_pdc::QmiClientHandle handle,
 }
 
 namespace guacamole_pdc {
+
+PdcClient::PdcClient()
+    : owned_shim_(std::make_unique<QcciShim>()), shim_(*owned_shim_) {}
 
 bool QcciShim::Load(std::string* error) {
   // Nothing to dynamically load: both libraries are linked at build

@@ -1,0 +1,2 @@
+# Exact platform-signed privileged APK, no shared UID. Fixed SID; owner user checked in service.
+user=_app seinfo=platform isPrivApp=true name=com.guacamole.efsd.controller domain=guacamole_efs_controller type=privapp_data_file level=s0

@@ -1,0 +1,46 @@
+package { default_applicable_licenses: ["Android-Apache-2.0"] }
+cc_library_static {
+ name: "guacamole_production_core", vendor: true, host_supported: true,
+ srcs: ["src/production_core.cpp"],
+ local_include_dirs: ["include"], export_include_dirs: ["include"],
+ header_libs: ["guacamole_carrier_catalog"], export_header_lib_headers: ["guacamole_carrier_catalog"],
+ static_libs: ["guacamole_production_state"],
+ export_static_lib_headers: ["guacamole_production_state"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_library_static {
+ name: "guacamole_production_device", vendor: true,
+ srcs: ["src/production_storage.cpp", "src/production_launcher.cpp", "src/production_coordinator.cpp", "src/legacy_evidence.cpp", "src/production_radio.cpp"],
+ local_include_dirs: ["include"], export_include_dirs: ["include"],
+ header_libs: ["guacamole_carrier_catalog"],
+ static_libs: ["guacamole_production_core", "guacamole_production_pdc"],
+ export_static_lib_headers: ["guacamole_production_core"],
+ generated_headers: ["guacamole_w1_artifact"],
+ shared_libs: ["libselinux", "libqmi_cci", "libqmiservices"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_binary {
+ name: "guacamole_efs_worker", vendor: true,
+ srcs: ["src/worker_main.cpp", "src/production_storage.cpp"],
+ local_include_dirs: ["include"], generated_headers: ["guacamole_w1_artifact"],
+ header_libs: ["guacamole_carrier_catalog"],
+ static_libs: ["guacamole_production_state", "guacamole_production_diag"],
+ shared_libs: ["libdiag", "libselinux"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_binary {
+ name: "guacamole_efs_evidence", vendor: true,
+ srcs: ["src/evidence_main.cpp", "src/production_storage.cpp"],
+ local_include_dirs: ["include"], header_libs: ["guacamole_carrier_catalog"],
+ static_libs: ["guacamole_production_state"], shared_libs: ["libselinux", "libcutils"],
+ init_rc: ["init/guacamole_efs_evidence.rc"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_test_host {
+ name: "guacamole_production_test", srcs: ["tests/production_test.cpp"],
+ local_include_dirs: ["include"], header_libs: ["guacamole_carrier_catalog"],
+ generated_headers: ["guacamole_w1_artifact"],
+ // Final link needs the implementation archives, not just re-exported headers.
+ static_libs: ["guacamole_production_core", "guacamole_production_state", "libgtest", "libgtest_main"],
+ cflags: ["-Wall", "-Wextra", "-Werror"], test_suites: ["general-tests"],
+}

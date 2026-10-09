@@ -1,0 +1,7 @@
+package { default_applicable_licenses: ["Android-Apache-2.0"] }
+android_app {
+ name: "GuacamoleCarrierController", system_ext_specific: true, privileged: true,
+ certificate: "platform", platform_apis: true,
+ srcs: ["src/**/*.java"], static_libs: ["com.guacamole.efsd-V2-java"],
+ optimize: { enabled: false },
+}

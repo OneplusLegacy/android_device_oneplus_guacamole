@@ -1,0 +1,52 @@
+{
+  "profiles": [
+    {
+      "name": "Common",
+      "id": "0bd71c00fc30d2ff8af86a8b16d1e01f69e6b493",
+      "size": 24508,
+      "version": 134285321,
+      "description": "Common-Commercial",
+      "index": 8,
+      "mbn_path": "",
+      "sha256": ""
+    },
+    {
+      "name": "SKT",
+      "id": "ca9c9dcb8d6d2be6e4f6b49ca3e4b5420769a7d1",
+      "size": 41172,
+      "version": 134293258,
+      "description": "Commercial-SKT",
+      "index": 39,
+      "mbn_path": "/vendor/firmware_mnt/image/modem_pr/mcfg/configs/mcfg_sw/generic/korea/skt/commerci/mcfg_sw.mbn",
+      "sha256": "9ee13411bd223576b0bdd14823929ace3544f1f1c2eab57a23a30038bc33805e"
+    },
+    {
+      "name": "KT",
+      "id": "79bd2e28f61310fd538c0a5b9bcbd19f143da762",
+      "size": 39544,
+      "version": 134293504,
+      "description": "Commercial-KT",
+      "index": 40,
+      "mbn_path": "/vendor/firmware_mnt/image/modem_pr/mcfg/configs/mcfg_sw/generic/korea/kt/commerci/mcfg_sw.mbn",
+      "sha256": "0305b51ca7446db9bb16e78964f6c6520739281c228ff596987d23484b9cd101"
+    },
+    {
+      "name": "LGU",
+      "id": "3a87a2ce830826e7de1f1a8cb2faf5012b4b71bc",
+      "size": 41088,
+      "version": 134293000,
+      "description": "Commercial-LGU",
+      "index": 38,
+      "mbn_path": "/vendor/firmware_mnt/image/modem_pr/mcfg/configs/mcfg_sw/generic/korea/lgu/commerci/mcfg_sw.mbn",
+      "sha256": "c84bcf76cb626debee291d6ee9b87e83b7c686070efe541c28d6ef46b84819b2"
+    }
+  ],
+  "stock": {
+    "size": 57655,
+    "sha256": "b81f1d34e8279547c789b6665e82db41a07d53451ea7a15bed7e628eb829f155"
+  },
+  "korea": {
+    "size": 58941,
+    "sha256": "b233088abcb1ea75df1c0d127e85508353728d40f180f230823ffeae5bd1a896"
+  }
+}

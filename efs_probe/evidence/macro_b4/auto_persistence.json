@@ -1,0 +1,82 @@
+{
+  "evidence_source": "User-reported B.4 device experiment; raw device captures not independently re-read in this change",
+  "wire_slot0_enable_hex": "010400000000001104000300000013010001",
+  "pre_skt_baseline": {
+    "label": "pre-SKT stock EFS baseline",
+    "get_feature_observed": false,
+    "autoselect_hex": "05",
+    "setting_observed_offsets": {
+      "0x04": "03",
+      "0x08": "01"
+    }
+  },
+  "before": {
+    "slot0": {
+      "selection_mode": 0,
+      "flex_mapping": false
+    },
+    "slot1": {
+      "selection_mode": 0,
+      "flex_mapping": false
+    },
+    "active": "Common",
+    "pending": null
+  },
+  "immediate": {
+    "slot0": {
+      "selection_mode": 3,
+      "flex_mapping": true
+    },
+    "slot1": {
+      "selection_mode": 0,
+      "flex_mapping": false
+    },
+    "active": "Common",
+    "pending": null,
+    "efs_changes": {
+      "mcfg_autoselect_by_uim": {
+        "before_hex": "80",
+        "after_hex": "87"
+      },
+      "mcfg_setting": {
+        "0x04": [
+          "00",
+          "03"
+        ],
+        "0x05": [
+          "00",
+          "01"
+        ]
+      }
+    },
+    "other_snapshot_files": "UNCHANGED"
+  },
+  "after_reboot": {
+    "slot0": {
+      "selection_mode": 3,
+      "flex_mapping": true
+    },
+    "slot1": {
+      "selection_mode": 0,
+      "flex_mapping": false
+    },
+    "active": "Common",
+    "pending": null,
+    "immediate_changes_persist": true,
+    "additional_changes": [
+      "mcfg_setting_1"
+    ],
+    "mcfg_setting_1_equals": "mcfg_setting",
+    "subscription01_files": "UNCHANGED",
+    "sel_db_muxd_digest": "UNCHANGED"
+  },
+  "inference": {
+    "setting_0x04_selection_mode": "STRONG_EMPIRICAL_CORRELATION_NOT_SCHEMA_CONFIRMED",
+    "setting_0x05_flex_mapping": "STRONG_EMPIRICAL_CORRELATION_NOT_SCHEMA_CONFIRMED",
+    "mcfg_setting_1": "PRIMARY_MIRROR_OR_BACKUP_HYPOTHESIS_NOT_SLOT1",
+    "subscription01": "SECOND_SUBSCRIPTION_HYPOTHESIS_WITHOUT_DIRECT_SLOT1_MUTATION"
+  },
+  "auto_experiment": "CLOSED",
+  "retain_slot0_pending_permanently": true,
+  "device_efs_write": "CLOSED"
+}

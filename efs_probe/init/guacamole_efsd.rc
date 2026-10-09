@@ -1,0 +1,47 @@
+# guacamole_efsd - Cycle 2 Section J (2026-09-24; init.rc fixed
+# 2026-09-24 W1 Finalization Round, item F). NOW WIRED into
+# device.mk's PRODUCT_PACKAGES as of 2026-09-26 (real-device W1 smoke
+# test round) - see device.mk's own comment on why this is required for
+# the VINTF manifest fragment / init.rc to actually land in the built
+# image, not just the Soong intermediates.
+#
+# dedicated uid/gid (item 12's explicit "root/su domain 의존 금지"):
+# AID_VENDOR_GUACAMOLE_EFSD=2909, REAL and build-verified via the same
+# mechanism already used by every other vendor AID on this platform -
+# see device/oneplus/sm8150-common/config.fs (TARGET_FS_CONFIG_GEN ->
+# fs_config_generator.py), where AID_VENDOR_QTI_DIAG=2901 is the exact
+# entry this project's own real-device runs already confirmed resolves
+# correctly for the `vendor_qti_diag` group below. NOT an invented
+# number - the next unused id in that file's existing sequential
+# AID_OEM_RESERVED (2900-2999) block.
+#
+# NAME FIXED 2026-09-25 (real build error from fs_config_generator.py:
+# any AID in the OEM_RESERVED 2900-2999 range must have a friendly name
+# starting with "vendor" - config.fs's macro is AID_VENDOR_GUACAMOLE_EFSD,
+# so the real runtime user/group name is "vendor_guacamole_efsd", not
+# "guacamole_efsd" - see config.fs's own note on this).
+#
+# FIXED (2026-09-24 W1 Finalization Round, item F): `oneshot false` was
+# INVALID init syntax - `oneshot` is a flag-only directive (its mere
+# presence marks a service one-shot), never `oneshot <bool>`. For this
+# PERSISTENT service the line is removed entirely, not set to false.
+# The empty `capabilities` line is also removed - this domain needs
+# none (see guacamole_efsd.te's own explicit "no capability beyond what
+# EFS2/PDC actually require" policy), and an empty `capabilities` line
+# is at best a no-op, at worst confusing about whether it was meant to
+# grant something.
+
+# Vendor init creates private storage before late_start. Existing file_contexts
+# labels this subtree guacamole_efsd_data_file; no daemon parent-dir grant needed.
+on post-fs-data
+    mkdir /data/vendor/guacamole_efsd 0700 vendor_guacamole_efsd vendor_guacamole_efsd
+    mkdir /data/vendor/guacamole_efsd/backup 0700 vendor_guacamole_efsd vendor_guacamole_efsd
+    mkdir /data/vendor/guacamole_efsd/transactions 0700 vendor_guacamole_efsd vendor_guacamole_efsd
+    mkdir /data/vendor/guacamole_efsd/production 0700 vendor_guacamole_efsd vendor_guacamole_efsd
+    restorecon /data/vendor/guacamole_efsd/production
+
+service guacamole_efsd /vendor/bin/guacamole_efsd
+    class late_start
+    user vendor_guacamole_efsd
+    group vendor_guacamole_efsd vendor_qti_diag
+    # V1 mutation methods stay blocked. V2 requires the dedicated controller SID.

@@ -1,0 +1,43 @@
+[
+  {
+    "path": "/home/ccc/dumpyara/working/oneplus7profirmware/modem/image/modem.b19",
+    "sha256": "79d3f6b1fa53cf6c538ce2c6d0bac5542f9097dd6599d3ddd04ab256460f497c",
+    "exact_nul_terminated_suffix_offsets": {
+      "mcfg_autoselect_by_uim": [
+        "0x1816fc8"
+      ],
+      "mcfg_autoselect_by_uim_Subscription01": [],
+      "mcfg_setting": [
+        "0x1817168",
+        "0x18253b3"
+      ],
+      "mcfg_setting_1": [],
+      "pdc_enable_auto_selection": [],
+      "pdc_set_feature": []
+    }
+  },
+  {
+    "path": "/home/ccc/dumpyara/working/oneplus7profirmware/vendor/lib64/libril-qc-hal-qmi.so",
+    "sha256": "492cf327e70532122e0fcb1a16fd26798dd4dbb396de1efd47082112de109fbe",
+    "exact_nul_terminated_suffix_offsets": {
+      "mcfg_autoselect_by_uim": [],
+      "mcfg_autoselect_by_uim_Subscription01": [],
+      "mcfg_setting": [],
+      "mcfg_setting_1": [],
+      "pdc_enable_auto_selection": [],
+      "pdc_set_feature": []
+    }
+  },
+  {
+    "path": "/home/ccc/dumpyara/working/oneplus7profirmware/vendor/lib64/libqmiservices.so",
+    "sha256": "b6cb88ce12a7010ab4e9eb178c005d6733c45b7747c1d8a6bf70ffbb43133975",
+    "exact_nul_terminated_suffix_offsets": {
+      "mcfg_autoselect_by_uim": [],
+      "mcfg_autoselect_by_uim_Subscription01": [],
+      "mcfg_setting": [],
+      "mcfg_setting_1": [],
+      "pdc_enable_auto_selection": [],
+      "pdc_set_feature": []
+    }
+  }
+]

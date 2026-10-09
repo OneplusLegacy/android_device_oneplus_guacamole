@@ -1,0 +1,2 @@
+# Guacamole init service control contexts are system-owned.
+# Defined in sepolicy/system_ext/private/property_contexts, not vendor policy.

@@ -1,0 +1,10 @@
+<compatibility-matrix version="4.0" type="framework">
+    <hal format="aidl" optional="true">
+        <name>com.guacamole.efsd</name>
+        <version>2</version>
+        <interface>
+            <name>IGuacamoleEfsd</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+</compatibility-matrix>

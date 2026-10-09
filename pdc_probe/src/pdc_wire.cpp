@@ -1,6 +1,59 @@
 #include "pdc_wire.h"
 
+// Only for the ProbeStatus enum / ProbeStatusToString() below - pdc_wire.h
+// itself stays independent of pdc_client.h (no circularity: pdc_client.h
+// includes pdc_wire.h, not the other way around). ProbeStatusToString is
+// implemented here, not in pdc_client.cpp, specifically so it links
+// cleanly into the host test target, which cannot link pdc_client.cpp
+// (that pulls in QcciShim, which needs the real on-device
+// libqmi_cci.so/libqmiservices.so - unavailable on a build host).
+#include "pdc_client.h"
+
 namespace guacamole_pdc {
+
+const char* ProbeStatusToString(ProbeStatus status) {
+  switch (status) {
+    case ProbeStatus::kOk: return "OK";
+    case ProbeStatus::kInitFailed: return "INIT_FAILED";
+    case ProbeStatus::kRequestSendFailed: return "REQUEST_SEND_FAILED";
+    case ProbeStatus::kRequestRejected: return "REQUEST_REJECTED";
+    case ProbeStatus::kTimeout: return "TIMEOUT";
+    case ProbeStatus::kMalformedResponse: return "MALFORMED_RESPONSE";
+    case ProbeStatus::kIndicationRejected: return "INDICATION_REJECTED";
+  }
+  return "UNKNOWN";
+}
+
+const char* ConfigPresenceToString(ConfigPresence presence) {
+  switch (presence) {
+    case ConfigPresence::kExists: return "EXISTS";
+    case ConfigPresence::kAbsent: return "ABSENT";
+    case ConfigPresence::kUnknown: return "UNKNOWN";
+  }
+  return "UNKNOWN";
+}
+
+ConfigPresence ClassifyConfigPresence(const GetConfigInfoOutcome& outcome) {
+  if (outcome.status == ProbeStatus::kOk) return ConfigPresence::kExists;
+  if (outcome.status == ProbeStatus::kIndicationRejected &&
+      outcome.data.error_status == kQmiProtocolErrorNoEntry) {
+    return ConfigPresence::kAbsent;
+  }
+  // Every other case - timeout, malformed, request-stage rejection, or
+  // an indication-stage rejection with any OTHER error code - is
+  // deliberately kUnknown, not kAbsent. See ConfigPresence's own
+  // comment in pdc_client.h for why this must fail closed.
+  return ConfigPresence::kUnknown;
+}
+
+std::vector<uint8_t> BuildGetSelectedConfigRequest(uint32_t token,
+                                                    ConfigType type) {
+  std::vector<uint8_t> body;
+  AppendTlvU32(&body, kTlvGetSelectedConfigReqConfigType,
+               static_cast<uint32_t>(type));
+  AppendTlvU32(&body, kTlvToken, token);
+  return body;
+}
 
 std::vector<uint8_t> BuildListConfigsRequest(uint32_t token,
                                               ConfigType type) {
@@ -208,7 +261,62 @@ GetConfigInfoResult ParseGetConfigInfoIndication(
   return result;
 }
 
+GetSelectedConfigResult ParseGetSelectedConfigIndication(
+    const uint8_t* buf, size_t len, std::optional<uint32_t> expected_token) {
+  GetSelectedConfigResult result;
+  if (buf == nullptr) return result;
+
+  bool got_result = false;
+  bool token_ok = !expected_token.has_value();
+  size_t offset = 0;
+  while (offset < len) {
+    size_t next = 0;
+    auto tlv = DecodeOneTlv(buf, len, offset, &next);
+    if (!tlv) {
+      result.ok = false;
+      return result;
+    }
+    offset = next;
+
+    if (tlv->type == kTlvToken) {
+      auto tok = TlvAsU32(*tlv);
+      if (tok && expected_token && *tok == *expected_token) token_ok = true;
+      continue;
+    }
+    if (tlv->type == kTlvIndicationResult) {
+      auto rc = TlvAsU16(*tlv);
+      if (!rc) return result;
+      result.error_status = *rc;
+      got_result = true;
+      continue;
+    }
+    if (tlv->type == kTlvGetSelectedConfigIndActiveId) {
+      auto id = TlvAsU8PrefixedBytes(*tlv, kMaxIdLen);
+      if (!id) return result;
+      result.active_id = *id;
+      continue;
+    }
+    if (tlv->type == kTlvGetSelectedConfigIndPendingId) {
+      auto id = TlvAsU8PrefixedBytes(*tlv, kMaxIdLen);
+      if (!id) return result;
+      result.pending_id = *id;
+      continue;
+    }
+    // Unknown TLV: skip, forward-compatible.
+  }
+
+  result.ok = got_result && token_ok;
+  return result;
+}
+
 IndicationOutcome ClassifyListConfigsResult(const ListConfigsResult& result) {
+  if (!result.ok) return IndicationOutcome::kMalformed;
+  if (result.error_status != 0) return IndicationOutcome::kRejected;
+  return IndicationOutcome::kSuccess;
+}
+
+IndicationOutcome ClassifyGetSelectedConfigResult(
+    const GetSelectedConfigResult& result) {
   if (!result.ok) return IndicationOutcome::kMalformed;
   if (result.error_status != 0) return IndicationOutcome::kRejected;
   return IndicationOutcome::kSuccess;

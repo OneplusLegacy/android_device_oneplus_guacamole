@@ -1,0 +1,6 @@
+# guacamole_efsd - Cycle 2 Section J/K (2026-09-24). Publishes its AIDL
+# interface (com.guacamole.efsd.IGuacamoleEfsd - see
+# ../../aidl/com/guacamole/efsd/IGuacamoleEfsd.aidl) under this service
+# name. See guacamole_efsd.te's add_service() grant and header comment
+# for why this is not yet wired into an active build.
+com.guacamole.efsd.IGuacamoleEfsd/default    u:object_r:guacamole_efsd_service:s0

@@ -1,0 +1,280 @@
+// H.41 EFS probe and safety library. CLI commands remain read-only.
+// Round 2 adds owned fresh sessions and durable recovery guards, but the
+// production AIDL service still returns BLOCKED_MAPPING without invoking them.
+// Host test sources are maintained here; build/test execution belongs to the user.
+
+package {
+    default_applicable_licenses: ["Android-Apache-2.0"],
+}
+
+// Shared EFS transport/transaction implementation; PDC is a separate module.
+cc_library_static {
+    name: "guacamole_efs_common",
+    vendor: true,
+    srcs: [
+        "src/efs_wire.cpp",
+        "src/efs_reader.cpp",
+        "src/efs_targets.cpp",
+        "src/diag_transport.cpp",
+        "src/diag_callback_shim.cpp",
+        "src/callback_smoke.cpp",
+        "src/stat_mcfg.cpp",
+        "src/hash.cpp",
+        "src/efs_real_client.cpp",
+        "src/efs_dir_lister.cpp",
+        "src/efs_snapshot.cpp",
+        "src/efs_transaction.cpp",
+        "src/efs_sessions.cpp",
+        "src/diag_session_cycle.cpp",
+        "src/diag_process_worker.cpp",
+        "src/diag_worker_protocol.cpp",
+        "src/process_efs_protocol.cpp",
+        "src/process_efs_executor.cpp",
+        "src/process_efs_posix.cpp",
+        "src/diag_frame.cpp",
+        "src/efs_write_wire.cpp",
+        "src/efs_write_targets.cpp",
+        "src/efs_writer.cpp",
+        "src/efs_real_write_client.cpp",
+        "src/korea_sel_db_patcher.cpp",
+        "src/original_auto_state.cpp",
+        "src/efs_transaction_backend.cpp",
+    ],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    export_include_dirs: ["include"],
+    shared_libs: [
+        // Real cc_prebuilt_library_shared module in
+        // vendor/oneplus/sm8150-common/Android.bp - see
+        // diag_callback_shim.h for the extern "C" symbols this library
+        // declares and links against directly (Diag_LSM_Init/DeInit,
+        // diag_register_callback, diag_switch_logging,
+        // diag_callback_send_data).
+        "libdiag",
+    ],
+    export_shared_lib_headers: ["libdiag"],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
+
+cc_binary {
+    name: "guacamole_efs_probe",
+    vendor: true,
+    // Manually-invoked, one-shot CLI tool for Phase D0 dev testing - not
+    // wired into any init .rc, same posture as guacamole_pdc_probe.
+    srcs: ["src/main.cpp"],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    static_libs: ["guacamole_efs_common"],
+    shared_libs: [
+        "libc",
+        "libc++",
+        "libdiag",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
+
+// Installed by device.mk, with a frozen V1 Binder service. No writer is connected.
+cc_binary {
+    name: "guacamole_efsd",
+    vendor: true,
+    srcs: [
+        "src/guacamole_efsd_main.cpp",
+        "src/guacamole_efsd_service.cpp",
+    ],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    // Static-library dependencies do not bundle their implementation archives.
+    static_libs: [
+        "guacamole_production_device",
+        "guacamole_production_core",
+        "guacamole_production_pdc",
+        "guacamole_production_state",
+    ],
+    shared_libs: [
+        "libc",
+        "libc++",
+        "libselinux",
+        "libqmi_cci",
+        "libqmiservices",
+        "libbinder_ndk",
+        "libbase",
+        "liblog",
+        // Real module name confirmed via `m` (2026-09-24): even an
+        // unfrozen aidl_interface generates a "-V1-<backend>" name in
+        // this AOSP version, never a bare "-<backend>" - see
+        // packages/apps/Settings/Android.bp's own note on the same
+        // finding (Soong's "did you mean" error surfaced it there).
+        "com.guacamole.efsd-V2-ndk",
+    ],
+    init_rc: ["init/guacamole_efsd.rc"],
+    vintf_fragments: ["aidl/default/com.guacamole.efsd-service.xml"],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+}
+
+cc_test_host {
+    name: "guacamole_efs_probe_test",
+    // Custom main supplies exec-only host fixtures; no vendor DIAG dependency.
+    gtest: false,
+    srcs: [
+        "tests/efs_wire_test.cpp",
+        "tests/efs_reader_test.cpp",
+        "tests/efs_targets_test.cpp",
+        "tests/diag_transport_test.cpp",
+        "tests/callback_smoke_test.cpp",
+        "tests/stat_mcfg_test.cpp",
+        "tests/hash_test.cpp",
+        "tests/efs_dir_lister_test.cpp",
+        "tests/efs_snapshot_test.cpp",
+        "tests/efs_transaction_test.cpp",
+        "tests/efs_sessions_test.cpp",
+        "tests/diag_session_cycle_test.cpp",
+        "tests/diag_process_worker_test.cpp",
+        "tests/process_efs_executor_test.cpp",
+        "tests/efs_test_main.cpp",
+        "tests/diag_frame_test.cpp",
+        "tests/efs_write_wire_test.cpp",
+        "tests/efs_writer_test.cpp",
+        "tests/korea_sel_db_patcher_test.cpp",
+        "tests/original_auto_state_test.cpp",
+        "tests/efs_transaction_backend_test.cpp",
+        "src/efs_wire.cpp",
+        "src/efs_reader.cpp",
+        "src/efs_targets.cpp",
+        "src/diag_transport.cpp",
+        "src/callback_smoke.cpp",
+        "src/stat_mcfg.cpp",
+        "src/hash.cpp",
+        "src/efs_real_client.cpp",
+        "src/efs_dir_lister.cpp",
+        "src/efs_snapshot.cpp",
+        "src/efs_transaction.cpp",
+        "src/efs_sessions.cpp",
+        "src/diag_session_cycle.cpp",
+        "src/diag_process_worker.cpp",
+        "src/diag_worker_protocol.cpp",
+        "src/process_efs_protocol.cpp",
+        "src/process_efs_executor.cpp",
+        "src/process_efs_posix.cpp",
+        "src/diag_frame.cpp",
+        "src/efs_write_wire.cpp",
+        "src/efs_write_targets.cpp",
+        "src/efs_writer.cpp",
+        "src/efs_real_write_client.cpp",
+        "src/korea_sel_db_patcher.cpp",
+        "src/original_auto_state.cpp",
+        "src/efs_transaction_backend.cpp",
+    ],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    static_libs: [
+        "libgtest",
+    ],
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+    ],
+    test_suites: ["general-tests"],
+    // Deliberately does NOT depend on diag_callback_shim.cpp/main.cpp:
+    // that file links against the real on-device libdiag.so and cannot
+    // run on (or even link against, on this host's architecture) a
+    // build host. diag_transport.cpp itself has NO libdiag dependency -
+    // it only depends on the abstract IDiagCallbackShim interface (see
+    // include/diag_callback_shim.h) - so diag_transport_test.cpp
+    // exercises the real correlation/timeout state machine class
+    // directly, against a fake shim, not a separately-reimplemented
+    // stand-in. efs_wire_test.cpp/efs_reader_test.cpp/efs_targets_test.cpp
+    // likewise exercise the full codec, whole-file-read orchestration,
+    // and path whitelist against synthetic buffers and a fake
+    // IEfsClient (see include/efs_client.h) - see
+    // PHASE_D1_EFS2_READONLY_FINDINGS.md for exactly what is and isn't
+    // covered by this test target. efs_real_client.cpp is included for
+    // compile coverage only (it too has zero libdiag dependency - see
+    // its own header comment) - it has no dedicated test file of its
+    // own, since it is pure Build*->SendSubsysCommand->Parse* wiring
+    // with no independent logic of its own to unit-test; it is
+    // exercised transitively through diag_transport_test.cpp's coverage
+    // of SendSubsysCommand() and efs_wire_test.cpp's coverage of every
+    // Build*/Parse* function it calls. efs_real_write_client.cpp is
+    // included for the same reason and under the same rationale -
+    // compile coverage only, no dedicated test file, exercised
+    // transitively through efs_write_wire_test.cpp's coverage of
+    // every Build*/Parse* function it calls plus
+    // diag_transport_test.cpp's coverage of SendSubsysCommand().
+}
+
+// Macro C: immutable reviewed XML. This build tool validates exact source and
+// target hashes, all Korea predicates/capabilities, ordering and preservation.
+python_binary_host {
+    name: "guacamole_w1_package_artifact",
+    main: "tools/package_w1_artifact.py",
+    srcs: ["tools/package_w1_artifact.py"],
+}
+genrule {
+    name: "guacamole_w1_artifact",
+    tools: ["guacamole_w1_package_artifact"],
+    srcs: ["artifacts/mcfg_sel_db.korea.xml", ":guacamole_carrier_catalog_json"],
+    out: ["w1_artifact.h"],
+    cmd: "$(location guacamole_w1_package_artifact) $(location artifacts/mcfg_sel_db.korea.xml) $(location :guacamole_carrier_catalog_json) $(out)",
+}
+cc_library_static {
+    name: "guacamole_w1_state",
+    vendor: true,
+    srcs: ["src/w1_experiment.cpp", "src/w1_journal.cpp", "src/w1_status.cpp"],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    export_include_dirs: ["include"],
+    static_libs: ["guacamole_efs_common"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_binary {
+    name: "guacamole_efs_experiment",
+    vendor: true,
+    init_rc: ["init/guacamole_efs_experiment.rc"],
+    srcs: ["src/w1_main.cpp", "src/w1_device.cpp", "src/w1_process_launcher.cpp"],
+    generated_headers: ["guacamole_w1_artifact"],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    static_libs: ["guacamole_w1_state", "guacamole_efs_common", "guacamole_w1_pdc_readonly"],
+    shared_libs: ["libdiag", "libqmi_cci", "libqmiservices", "libbase", "libselinux"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+    product_variables: { debuggable: { cflags: ["-DGUACAMOLE_W1_DEBUG"] } },
+}
+cc_test_host {
+    name: "guacamole_w1_experiment_test",
+    srcs: ["tests/w1_experiment_test.cpp", "src/w1_experiment.cpp", "src/w1_journal.cpp", "src/w1_status.cpp", "src/hash.cpp"],
+    generated_headers: ["guacamole_w1_artifact"],
+    local_include_dirs: ["include"],
+    header_libs: ["guacamole_carrier_catalog"],
+    static_libs: ["libgtest", "libgtest_main"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+    test_suites: ["general-tests"],
+}
+
+// Minimal production graph: no same-process transaction, debug cache or CLI launcher.
+cc_library_static {
+ name: "guacamole_production_state", vendor: true, host_supported: true,
+ srcs: ["src/w1_experiment.cpp", "src/w1_journal.cpp", "src/hash.cpp", "src/process_efs_executor.cpp", "src/process_efs_protocol.cpp", "src/diag_worker_protocol.cpp", "src/efs_write_targets.cpp", "src/efs_targets.cpp"],
+ local_include_dirs: ["include"], export_include_dirs: ["include"],
+ header_libs: ["guacamole_carrier_catalog"], export_header_lib_headers: ["guacamole_carrier_catalog"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+cc_library_static {
+ name: "guacamole_production_diag", vendor: true,
+ srcs: ["src/diag_callback_shim.cpp", "src/diag_transport.cpp", "src/diag_frame.cpp", "src/efs_sessions.cpp", "src/efs_real_client.cpp", "src/efs_real_write_client.cpp", "src/efs_reader.cpp", "src/efs_writer.cpp", "src/efs_wire.cpp", "src/efs_write_wire.cpp"],
+ local_include_dirs: ["include"], export_include_dirs: ["include"],
+ static_libs: ["guacamole_production_state"], shared_libs: ["libdiag"],
+ cflags: ["-Wall", "-Wextra", "-Werror"],
+}

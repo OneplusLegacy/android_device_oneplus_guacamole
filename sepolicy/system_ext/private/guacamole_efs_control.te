@@ -1,0 +1,5 @@
+# Core-owned exact init control labels; not a vendor configuration property.
+system_internal_prop(guacamole_efs_ctl_prop)
+userdebug_or_eng(`
+  set_prop(su, guacamole_efs_ctl_prop)
+')

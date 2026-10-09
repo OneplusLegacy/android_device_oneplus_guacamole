@@ -1,0 +1,170 @@
+
+/home/ccc/dumpyara/working/oneplus7profirmware/vendor/lib64/libril-qc-hal-qmi.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+0000000001d423f4 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01>:
+ 1d423f4: d10143ff     	sub	sp, sp, #0x50
+ 1d423f8: a9047bfd     	stp	x29, x30, [sp, #0x40]
+ 1d423fc: 910103fd     	add	x29, sp, #0x40
+ 1d42400: d53bd048     	mrs	x8, TPIDR_EL0
+ 1d42404: f9401508     	ldr	x8, [x8, #0x28]
+ 1d42408: f81f83a8     	stur	x8, [x29, #-0x8]
+ 1d4240c: f90013e0     	str	x0, [sp, #0x20]
+ 1d42410: aa1f03e8     	mov	x8, xzr
+ 1d42414: f81f03a8     	stur	x8, [x29, #-0x10]
+ 1d42418: 2a1f03e9     	mov	w9, wzr
+ 1d4241c: b9001fe9     	str	w9, [sp, #0x1c]
+ 1d42420: b9001be9     	str	w9, [sp, #0x18]
+ 1d42424: 900009c8     	adrp	x8, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d42428: 9136c108     	add	x8, x8, #0xdb0
+ 1d4242c: aa0803e0     	mov	x0, x8
+ 1d42430: f9000be8     	str	x8, [sp, #0x10]
+ 1d42434: 9401375f     	bl	0x1d901b0 <_ZN8qtimutex14QtiSharedMutex4lockEv@plt>
+ 1d42438: f9400be8     	ldr	x8, [sp, #0x10]
+ 1d4243c: b9438109     	ldr	w9, [x8, #0x380]
+ 1d42440: 34000109     	cbz	w9, 0x1d42460 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x6c>
+ 1d42444: 14000001     	b	0x1d42448 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x54>
+ 1d42448: 900009c0     	adrp	x0, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d4244c: 9136c000     	add	x0, x0, #0xdb0
+ 1d42450: 9401375c     	bl	0x1d901c0 <_ZN8qtimutex14QtiSharedMutex6unlockEv@plt>
+ 1d42454: 12800028     	mov	w8, #-0x2               // =-2
+ 1d42458: b81ec3a8     	stur	w8, [x29, #-0x14]
+ 1d4245c: 1400003e     	b	0x1d42554 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x160>
+ 1d42460: 900009c8     	adrp	x8, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d42464: 9136c108     	add	x8, x8, #0xdb0
+ 1d42468: 52800029     	mov	w9, #0x1                // =1
+ 1d4246c: b9038109     	str	w9, [x8, #0x380]
+ 1d42470: aa0803e0     	mov	x0, x8
+ 1d42474: 94013753     	bl	0x1d901c0 <_ZN8qtimutex14QtiSharedMutex6unlockEv@plt>
+ 1d42478: f0000828     	adrp	x8, 0x1e49000
+ 1d4247c: f9409508     	ldr	x8, [x8, #0x128]
+ 1d42480: f9400500     	ldr	x0, [x8, #0x8]
+ 1d42484: f94013e2     	ldr	x2, [sp, #0x20]
+ 1d42488: 528005c1     	mov	w1, #0x2e               // =46
+ 1d4248c: 52800a03     	mov	w3, #0x50               // =80
+ 1d42490: d10043a4     	sub	x4, x29, #0x10
+ 1d42494: 52800105     	mov	w5, #0x8                // =8
+ 1d42498: 5284e206     	mov	w6, #0x2710             // =10000
+ 1d4249c: 940143a1     	bl	0x1d93320 <qmi_client_send_msg_sync@plt>
+ 1d424a0: b9001fe0     	str	w0, [sp, #0x1c]
+ 1d424a4: b9401fe9     	ldr	w9, [sp, #0x1c]
+ 1d424a8: 340001a9     	cbz	w9, 0x1d424dc <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0xe8>
+ 1d424ac: 14000001     	b	0x1d424b0 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0xbc>
+ 1d424b0: b9401fe4     	ldr	w4, [sp, #0x1c]
+ 1d424b4: f0ff2f62     	adrp	x2, 0x331000
+ 1d424b8: 91003842     	add	x2, x2, #0xe
+ 1d424bc: d0ff32e3     	adrp	x3, 0x3a0000
+ 1d424c0: 9109e063     	add	x3, x3, #0x278
+ 1d424c4: 52800020     	mov	w0, #0x1                // =1
+ 1d424c8: 528000c1     	mov	w1, #0x6                // =6
+ 1d424cc: 94013d29     	bl	0x1d91970 <__android_log_buf_print@plt>
+ 1d424d0: 12800008     	mov	w8, #-0x1               // =-1
+ 1d424d4: b81ec3a8     	stur	w8, [x29, #-0x14]
+ 1d424d8: 1400001f     	b	0x1d42554 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x160>
+ 1d424dc: 900009c8     	adrp	x8, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d424e0: 9136c108     	add	x8, x8, #0xdb0
+ 1d424e4: aa0803e0     	mov	x0, x8
+ 1d424e8: f90007e8     	str	x8, [sp, #0x8]
+ 1d424ec: 94013731     	bl	0x1d901b0 <_ZN8qtimutex14QtiSharedMutex4lockEv@plt>
+ 1d424f0: f94007e8     	ldr	x8, [sp, #0x8]
+ 1d424f4: b9438909     	ldr	w9, [x8, #0x388]
+ 1d424f8: 35000149     	cbnz	w9, 0x1d42520 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x12c>
+ 1d424fc: 14000001     	b	0x1d42500 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x10c>
+ 1d42500: 900009c8     	adrp	x8, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d42504: 9136c108     	add	x8, x8, #0xdb0
+ 1d42508: 52800029     	mov	w9, #0x1                // =1
+ 1d4250c: b9038509     	str	w9, [x8, #0x384]
+ 1d42510: 910d0100     	add	x0, x8, #0x340
+ 1d42514: aa0803e1     	mov	x1, x8
+ 1d42518: 97b9784f     	bl	0xba0654 <_Z27util_sync_data_wait_on_condP19util_sync_data_typei+0x17c>
+ 1d4251c: 14000001     	b	0x1d42520 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x12c>
+ 1d42520: 900009c8     	adrp	x8, 0x1e7a000 <_ZGVZN14add_message_idI39RilRequestGetCdmaBroadcastConfigMessageE20get_class_message_idEvE2id>
+ 1d42524: 9136c108     	add	x8, x8, #0xdb0
+ 1d42528: b9438d09     	ldr	w9, [x8, #0x38c]
+ 1d4252c: b9001be9     	str	w9, [sp, #0x18]
+ 1d42530: 2a1f03e9     	mov	w9, wzr
+ 1d42534: b9038109     	str	w9, [x8, #0x380]
+ 1d42538: b9038509     	str	w9, [x8, #0x384]
+ 1d4253c: b9038909     	str	w9, [x8, #0x388]
+ 1d42540: aa0803e0     	mov	x0, x8
+ 1d42544: 9401371f     	bl	0x1d901c0 <_ZN8qtimutex14QtiSharedMutex6unlockEv@plt>
+ 1d42548: b9401be9     	ldr	w9, [sp, #0x18]
+ 1d4254c: b81ec3a9     	stur	w9, [x29, #-0x14]
+ 1d42550: 14000001     	b	0x1d42554 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x160>
+ 1d42554: b85ec3a8     	ldur	w8, [x29, #-0x14]
+ 1d42558: d53bd049     	mrs	x9, TPIDR_EL0
+ 1d4255c: f9401529     	ldr	x9, [x9, #0x28]
+ 1d42560: f85f83aa     	ldur	x10, [x29, #-0x8]
+ 1d42564: eb0a0129     	subs	x9, x9, x10
+ 1d42568: b90007e8     	str	w8, [sp, #0x4]
+ 1d4256c: 540000c1     	b.ne	0x1d42584 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x190>
+ 1d42570: 14000001     	b	0x1d42574 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01+0x180>
+ 1d42574: b94007e0     	ldr	w0, [sp, #0x4]
+ 1d42578: a9447bfd     	ldp	x29, x30, [sp, #0x40]
+ 1d4257c: 910143ff     	add	sp, sp, #0x50
+ 1d42580: d65f03c0     	ret
+ 1d42584: 94013743     	bl	0x1d90290 <__stack_chk_fail@plt>
+
+0000000001d42588 <_Z25pdc_enable_auto_selectionii>:
+ 1d42588: d10283ff     	sub	sp, sp, #0xa0
+ 1d4258c: a9097bfd     	stp	x29, x30, [sp, #0x90]
+ 1d42590: 910243fd     	add	x29, sp, #0x90
+ 1d42594: d53bd048     	mrs	x8, TPIDR_EL0
+ 1d42598: f9401508     	ldr	x8, [x8, #0x28]
+ 1d4259c: f81f83a8     	stur	x8, [x29, #-0x8]
+ 1d425a0: b9000fe0     	str	w0, [sp, #0xc]
+ 1d425a4: b9000be1     	str	w1, [sp, #0x8]
+ 1d425a8: 6f00e400     	movi	v0.2d, #0000000000000000
+ 1d425ac: 3d801fe0     	str	q0, [sp, #0x70]
+ 1d425b0: 3d801be0     	str	q0, [sp, #0x60]
+ 1d425b4: 3d8017e0     	str	q0, [sp, #0x50]
+ 1d425b8: 3d8013e0     	str	q0, [sp, #0x40]
+ 1d425bc: 3d800fe0     	str	q0, [sp, #0x30]
+ 1d425c0: 2a1f03e9     	mov	w9, wzr
+ 1d425c4: b90007e9     	str	w9, [sp, #0x4]
+ 1d425c8: 9100c3e8     	add	x8, sp, #0x30
+ 1d425cc: f90017e8     	str	x8, [sp, #0x28]
+ 1d425d0: 52800a0a     	mov	w10, #0x50              // =80
+ 1d425d4: 2a0a03e8     	mov	w8, w10
+ 1d425d8: f90013e8     	str	x8, [sp, #0x20]
+ 1d425dc: b9001fe9     	str	w9, [sp, #0x1c]
+ 1d425e0: f9000be8     	str	x8, [sp, #0x10]
+ 1d425e4: f94017e0     	ldr	x0, [sp, #0x28]
+ 1d425e8: b9401fe1     	ldr	w1, [sp, #0x1c]
+ 1d425ec: f9400be2     	ldr	x2, [sp, #0x10]
+ 1d425f0: f94013e3     	ldr	x3, [sp, #0x20]
+ 1d425f4: 94013707     	bl	0x1d90210 <__memset_chk@plt>
+ 1d425f8: b9400be9     	ldr	w9, [sp, #0x8]
+ 1d425fc: b90033e9     	str	w9, [sp, #0x30]
+ 1d42600: 52800029     	mov	w9, #0x1                // =1
+ 1d42604: 3900f3e9     	strb	w9, [sp, #0x3c]
+ 1d42608: 390133e9     	strb	w9, [sp, #0x4c]
+ 1d4260c: b9400fe9     	ldr	w9, [sp, #0xc]
+ 1d42610: 340000e9     	cbz	w9, 0x1d4262c <_Z25pdc_enable_auto_selectionii+0xa4>
+ 1d42614: 14000001     	b	0x1d42618 <_Z25pdc_enable_auto_selectionii+0x90>
+ 1d42618: 52800068     	mov	w8, #0x3                // =3
+ 1d4261c: b90043e8     	str	w8, [sp, #0x40]
+ 1d42620: 52800028     	mov	w8, #0x1                // =1
+ 1d42624: 390137e8     	strb	w8, [sp, #0x4d]
+ 1d42628: 14000005     	b	0x1d4263c <_Z25pdc_enable_auto_selectionii+0xb4>
+ 1d4262c: 2a1f03e8     	mov	w8, wzr
+ 1d42630: b90043e8     	str	w8, [sp, #0x40]
+ 1d42634: 390137e8     	strb	w8, [sp, #0x4d]
+ 1d42638: 14000001     	b	0x1d4263c <_Z25pdc_enable_auto_selectionii+0xb4>
+ 1d4263c: 9100c3e0     	add	x0, sp, #0x30
+ 1d42640: 9401bf64     	bl	0x1db23d0 <_Z15pdc_set_featureP27pdc_set_feature_req_msg_v01@plt>
+ 1d42644: b90007e0     	str	w0, [sp, #0x4]
+ 1d42648: b94007e8     	ldr	w8, [sp, #0x4]
+ 1d4264c: d53bd049     	mrs	x9, TPIDR_EL0
+ 1d42650: f9401529     	ldr	x9, [x9, #0x28]
+ 1d42654: f85f83aa     	ldur	x10, [x29, #-0x8]
+ 1d42658: eb0a0129     	subs	x9, x9, x10
+ 1d4265c: b90003e8     	str	w8, [sp]
+ 1d42660: 540000c1     	b.ne	0x1d42678 <_Z25pdc_enable_auto_selectionii+0xf0>
+ 1d42664: 14000001     	b	0x1d42668 <_Z25pdc_enable_auto_selectionii+0xe0>
+ 1d42668: b94003e0     	ldr	w0, [sp]
+ 1d4266c: a9497bfd     	ldp	x29, x30, [sp, #0x90]
+ 1d42670: 910283ff     	add	sp, sp, #0xa0
+ 1d42674: d65f03c0     	ret
+ 1d42678: 94013706     	bl	0x1d90290 <__stack_chk_fail@plt>

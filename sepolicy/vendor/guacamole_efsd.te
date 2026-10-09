@@ -1,0 +1,22 @@
+# Production coordinator: no DIAG access. No shell/root mutation control.
+type guacamole_efsd, domain;
+type guacamole_efsd_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(guacamole_efsd)
+type guacamole_efsd_data_file, file_type, data_file_type;
+type guacamole_efsd_journal_file, file_type, data_file_type;
+allow guacamole_efsd guacamole_efsd_data_file:dir search;
+allow guacamole_efsd guacamole_efsd_journal_file:dir { search open read getattr write add_name };
+allow guacamole_efsd guacamole_efsd_journal_file:file { create open read write getattr lock };
+allow guacamole_efsd self:process { fork sigchld };
+allow guacamole_efsd self:fifo_file { create open read write getattr };
+qmux_socket(guacamole_efsd)
+allow guacamole_efsd self:qipcrtr_socket create_socket_perms_no_ioctl;
+allow guacamole_efsd same_process_hal_file:file { execute open read getattr map };
+type guacamole_efsd_service, service_manager_type;
+binder_use(guacamole_efsd)
+add_service(guacamole_efsd, guacamole_efsd_service)
+# Settings status calls only; service-side SID+UID rejects its mutation calls.
+allow system_app guacamole_efsd_service:service_manager find;
+binder_call(system_app, guacamole_efsd)
+allow guacamole_efs_controller guacamole_efsd_service:service_manager find;
+binder_call(guacamole_efs_controller, guacamole_efsd)

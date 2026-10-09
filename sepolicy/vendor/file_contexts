@@ -1,1 +1,29 @@
 /vendor/bin/guacamole_pdc_probe    u:object_r:guacamole_pdc_probe_exec:s0
+
+# guacamole_efsd - Cycle 2 Section J (2026-09-24). See
+# ../vendor/guacamole_efsd.te for the domain this exec label transitions
+# into, and that file's own header comment for why this is not yet
+# wired into an active PRODUCT_PACKAGES build.
+/vendor/bin/guacamole_efsd             u:object_r:guacamole_efsd_exec:s0
+/data/vendor/guacamole_efsd(/.*)?      u:object_r:guacamole_efsd_data_file:s0
+
+# Debug-only manual mapping probe; reuse the existing restricted QMI domain.
+/vendor/bin/guacamole_pdc_mapping_probe    u:object_r:guacamole_pdc_probe_exec:s0
+
+/vendor/bin/guacamole_pdc_carrier_probe    u:object_r:guacamole_pdc_probe_exec:s0
+
+# Private manual AUTO experiment checkpoint (no EFS backup/write access).
+/data/vendor/guacamole_pdc_experiment(/.*)? u:object_r:guacamole_pdc_experiment_data_file:s0
+
+/data/vendor/guacamole_pdc_reports(/.*)? u:object_r:guacamole_pdc_experiment_data_file:s0
+
+# Macro C fixed debug-only experiment and separate read-only daemon observation.
+/vendor/bin/guacamole_efs_experiment u:object_r:guacamole_efs_experiment_exec:s0
+/data/vendor/guacamole_efs_experiment(/.*)? u:object_r:guacamole_efs_experiment_data_file:s0
+/data/vendor/guacamole_efs_reports(/.*)? u:object_r:guacamole_efs_reports_file:s0
+/data/vendor/guacamole_efs_observation(/.*)? u:object_r:guacamole_efs_observation_file:s0
+
+/vendor/bin/guacamole_efs_worker u:object_r:guacamole_efs_worker_exec:s0
+/vendor/bin/guacamole_efs_evidence u:object_r:guacamole_efs_evidence_exec:s0
+/dev/socket/guacamole_efs_evidence u:object_r:guacamole_efs_evidence_socket:s0
+/data/vendor/guacamole_efsd/production(/.*)? u:object_r:guacamole_efsd_journal_file:s0

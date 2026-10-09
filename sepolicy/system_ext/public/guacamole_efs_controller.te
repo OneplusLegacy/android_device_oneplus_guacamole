@@ -1,0 +1,2 @@
+# Export only this dedicated identity for vendor Binder policy.
+type guacamole_efs_controller, domain;

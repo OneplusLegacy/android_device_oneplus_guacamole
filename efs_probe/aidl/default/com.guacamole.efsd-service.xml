@@ -1,0 +1,7 @@
+<manifest version="1.0" type="device">
+    <hal format="aidl">
+        <name>com.guacamole.efsd</name>
+        <version>2</version>
+        <fqname>IGuacamoleEfsd/default</fqname>
+    </hal>
+</manifest>

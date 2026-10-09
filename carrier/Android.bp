@@ -1,0 +1,16 @@
+package { default_applicable_licenses: ["Android-Apache-2.0"] }
+python_binary_host {
+ name: "guacamole_catalog_generator", main: "generate_catalog.py", srcs: ["generate_catalog.py"],
+}
+genrule {
+ name: "guacamole_catalog_generated", tools: ["guacamole_catalog_generator"],
+ srcs: ["catalog.json"], out: ["carrier_catalog_generated.h"],
+ cmd: "$(location guacamole_catalog_generator) $(in) $(out)",
+}
+cc_library_headers {
+ name: "guacamole_carrier_catalog", vendor_available: true, host_supported: true,
+ export_include_dirs: ["include"], generated_headers: ["guacamole_catalog_generated"],
+ export_generated_headers: ["guacamole_catalog_generated"],
+}
+
+filegroup { name: "guacamole_carrier_catalog_json", srcs: ["catalog.json"] }

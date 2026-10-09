@@ -1,0 +1,62 @@
+{
+  "binary_sha256": "b6cb88ce12a7010ab4e9eb178c005d6733c45b7747c1d8a6bf70ffbb43133975",
+  "public_reference": "Telit LM940 QMI Command Reference Guide r1, sections 11.2.28-31",
+  "public_url": "https://pdfcoffee.com/telit-lm940-qmi-command-reference-guide-r1-pdf-free.html",
+  "public_html_sha256": "342a9473837ea4dcdc2073e4897c339a6b0dd1de5f95697cf43bbfc49a4d6ef2",
+  "local_definitions": [
+    {
+      "kind": "request",
+      "message": "0x2d",
+      "index": 38,
+      "C_size": 12,
+      "max_wire": 14,
+      "descriptor": "0xf184",
+      "hex": "010200c4100208"
+    },
+    {
+      "kind": "request",
+      "message": "0x2e",
+      "index": 41,
+      "C_size": 80,
+      "max_wire": 82,
+      "descriptor": "0xf1c3",
+      "hex": "0102004410020844110210441202184113001d421402204415022844160230441702384418024042190146421a014ac21b014e"
+    },
+    {
+      "kind": "response",
+      "message": "0x2d",
+      "index": 39,
+      "C_size": 8,
+      "max_wire": 7,
+      "descriptor": "0xf18b",
+      "hex": "8207000001"
+    },
+    {
+      "kind": "response",
+      "message": "0x2e",
+      "index": 42,
+      "C_size": 8,
+      "max_wire": 7,
+      "descriptor": "0xf1f6",
+      "hex": "8207000001"
+    },
+    {
+      "kind": "indication",
+      "message": "0x2d",
+      "index": 40,
+      "C_size": 80,
+      "max_wire": 80,
+      "descriptor": "0xf190",
+      "hex": "0105004410020844110210441202184113001d421402204415022844160230441702384418024042190146421a014ac21b014e"
+    },
+    {
+      "kind": "indication",
+      "message": "0x2e",
+      "index": 43,
+      "C_size": 12,
+      "max_wire": 12,
+      "descriptor": "0xf1fb",
+      "hex": "010500c4100208"
+    }
+  ]
+}

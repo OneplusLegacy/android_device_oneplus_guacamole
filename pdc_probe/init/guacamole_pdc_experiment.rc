@@ -1,0 +1,38 @@
+# Installed with debug-only manual carrier probe, not the production daemon.
+# Provision state storage only; never starts an experiment at boot.
+on post-fs-data
+    mkdir /data/vendor/guacamole_pdc_experiment 0700 root root
+    restorecon_recursive /data/vendor/guacamole_pdc_experiment
+    mkdir /data/vendor/guacamole_pdc_reports 0700 root root
+    restorecon_recursive /data/vendor/guacamole_pdc_reports
+
+# Explicit manual start only. No boot/property action starts these services.
+service vendor.guacamole-pdc-context /vendor/bin/guacamole_pdc_carrier_probe --init-report self-context-readonly
+    disabled
+    oneshot
+    user root
+    group root
+
+service vendor.guacamole-pdc-feature0 /vendor/bin/guacamole_pdc_carrier_probe --init-report get-auto-feature-readonly 0
+    disabled
+    oneshot
+    user root
+    group root
+
+service vendor.guacamole-pdc-feature1 /vendor/bin/guacamole_pdc_carrier_probe --init-report get-auto-feature-readonly 1
+    disabled
+    oneshot
+    user root
+    group root
+
+service vendor.guacamole-pdc-selected /vendor/bin/guacamole_pdc_carrier_probe --init-report selected
+    disabled
+    oneshot
+    user root
+    group root
+
+service vendor.guacamole-pdc-auto0-enable-once /vendor/bin/guacamole_pdc_carrier_probe --init-report enable-auto-selection-slot0-once --confirm GUACAMOLE_AUTO_SLOT0_ENABLE_EXPERIMENT_V1
+    disabled
+    oneshot
+    user root
+    group root

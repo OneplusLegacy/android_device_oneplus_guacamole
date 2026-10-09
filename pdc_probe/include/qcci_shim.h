@@ -132,32 +132,46 @@ struct VersionTriple {
   int32_t tool;
 };
 
+// Injectable transport boundary. Production uses QcciShim; host routing tests
+// use the same PdcClient with a fake implementation, without vendor libraries.
+class IQcciShim {
+ public:
+  virtual ~IQcciShim() = default;
+  virtual bool Load(std::string* error) = 0;
+  virtual QmiServiceObject PdcGetServiceObject(int32_t, int32_t, int32_t) = 0;
+  virtual int ClientInitInstance(QmiServiceObject, QmiIndicationCallback,
+      void*, uint32_t, QmiClientHandle*) = 0;
+  virtual int ClientRelease(QmiClientHandle) = 0;
+  virtual int SendRawMsgSync(QmiClientHandle, unsigned int, const void*,
+      unsigned int, void*, unsigned int, unsigned int*, unsigned int) = 0;
+};
+
 // Thin, directly-linked wrapper - `Load()` is kept only so callers have
 // one uniform place to check "is the transport ready" and one uniform
 // error-reporting shape, even though there is no dynamic loading left
 // to do (symbol resolution now happens at link time, not here).
-class QcciShim {
+class QcciShim : public IQcciShim {
  public:
   QcciShim() = default;
-  ~QcciShim() = default;
+  ~QcciShim() override = default;
 
   QcciShim(const QcciShim&) = delete;
   QcciShim& operator=(const QcciShim&) = delete;
 
-  bool Load(std::string* error);
+  bool Load(std::string* error) override;
 
   // Wrappers around the linked functions. All return kQmiNoErr (0) on
   // success; any other value is treated as failure by callers.
   QmiServiceObject PdcGetServiceObject(int32_t major, int32_t minor,
-                                       int32_t tool);
+                                       int32_t tool) override;
   int ClientInitInstance(QmiServiceObject service_obj,
                           QmiIndicationCallback ind_cb, void* ind_cb_data,
-                          uint32_t timeout_ms, QmiClientHandle* out_handle);
-  int ClientRelease(QmiClientHandle handle);
+                          uint32_t timeout_ms, QmiClientHandle* out_handle) override;
+  int ClientRelease(QmiClientHandle handle) override;
   int SendRawMsgSync(QmiClientHandle handle, unsigned int msg_id,
                       const void* req_buf, unsigned int req_len,
                       void* resp_buf, unsigned int resp_buf_capacity,
-                      unsigned int* resp_recv_len, unsigned int timeout_ms);
+                      unsigned int* resp_recv_len, unsigned int timeout_ms) override;
 
   bool loaded() const { return loaded_; }
 

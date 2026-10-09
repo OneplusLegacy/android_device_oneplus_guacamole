@@ -42,9 +42,11 @@
 //   - The exact (major, minor, tool) version triple to pass into
 //     `pdc_get_service_object_internal_v01` (see qcci_shim.h).
 //
-// Phase B scope: List Configs (0x24) and Get Config Info (0x28) ONLY.
-// Load/Activate/Deactivate/Delete/Set Selected Config are intentionally
-// NOT implemented here - see the project's Phase B "absolute prohibitions".
+// Phase B scope: List Configs (0x24), Get Config Info (0x28), and
+// (Phase B2) Get Selected Config (0x22) - all pure reads. Load Config
+// (0x26, Phase C0) is a separate, explicitly-gated write path - see
+// pdc_load.h. Activate/Deactivate/Delete/Set Selected Config are still
+// NOT implemented anywhere in this codebase.
 
 #pragma once
 
@@ -57,14 +59,39 @@
 
 namespace guacamole_pdc {
 
+// QMI_PROTOCOL_ERROR_NO_ENTRY, from libqmi's public
+// src/libqmi-glib/qmi-errors.h (`QMI_PROTOCOL_ERROR_NO_ENTRY = 50,
+// /*< nick=NoEntry >*/`). PDC defines no service-specific error codes
+// of its own (confirmed: src/libqmi-glib/qmi-enums-pdc.h has only
+// QmiPdcConfigurationType/QmiPdcRefreshEventType, no error enum), so it
+// uses this generic QmiProtocolError set for its Indication Result
+// error codes. This is the best publicly-evidenced candidate for "no
+// such config ID" - NOT byte-confirmed against this specific device's
+// actual observed error_status value for a nonexistent-ID lookup (a gap
+// noted honestly, not glossed over). The fail-closed design in
+// ClassifyConfigPresence() means a wrong guess here only makes the tool
+// MORE conservative (treats a real "not found" as kUnknown -> refuses
+// to load) rather than less safe (never misclassifies kUnknown as
+// kAbsent and proceeds).
+constexpr uint16_t kQmiProtocolErrorNoEntry = 50;
+
 // --- Message IDs (data/qmi-service-pdc.json) ---
+constexpr uint32_t kMsgGetSelectedConfig = 0x0022;
 constexpr uint32_t kMsgListConfigs = 0x0024;
 constexpr uint32_t kMsgGetConfigInfo = 0x0028;
 
 // --- Universal QMI TLV IDs (data/qmi-common.json, data/qmi-service-pdc.json) ---
+// IMPORTANT: a TLV id is only meaningful within the context of a single
+// message ID - the same numeric id (e.g. 0x11) is reused with a
+// DIFFERENT meaning by different PDC messages. Every constant below is
+// named for the exact message it belongs to; never share one across
+// messages even when the numeric value happens to match.
 constexpr uint8_t kTlvOperationResult = 0x02;    // every sync response
 constexpr uint8_t kTlvIndicationResult = 0x01;   // every PDC indication
 constexpr uint8_t kTlvToken = 0x10;              // request+indication, all PDC msgs
+constexpr uint8_t kTlvGetSelectedConfigReqConfigType = 0x01;  // "Config Type" common-ref
+constexpr uint8_t kTlvGetSelectedConfigIndActiveId = 0x11;
+constexpr uint8_t kTlvGetSelectedConfigIndPendingId = 0x12;
 constexpr uint8_t kTlvListConfigsReqConfigType = 0x11;
 constexpr uint8_t kTlvListConfigsIndConfigs = 0x11;
 constexpr uint8_t kTlvConfigTypeAndId = 0x01;    // Get Config Info request
@@ -119,6 +146,23 @@ struct GetConfigInfoResult {
   bool has_version = false;
 };
 
+// Active/pending config IDs are variable-length binary values (same
+// guint8-size-prefixed array format as everywhere else in PDC) - never
+// assume a fixed length (e.g. 20 bytes just because that's what the
+// Common-Commercial config's ID happened to be on the real device this
+// was tested against).
+struct GetSelectedConfigResult {
+  bool ok = false;
+  uint16_t error_status = 0;
+  uint16_t error_code = 0;
+  std::optional<std::vector<uint8_t>> active_id;   // absent = NONE
+  std::optional<std::vector<uint8_t>> pending_id;  // absent = NONE
+};
+
+// Builds the TLV body for a Get Selected Config request.
+std::vector<uint8_t> BuildGetSelectedConfigRequest(uint32_t token,
+                                                    ConfigType type);
+
 // Builds the TLV body (NOT including the service_header - QCCI's raw send
 // API takes msg_id out of band) for a List Configs request.
 std::vector<uint8_t> BuildListConfigsRequest(uint32_t token,
@@ -151,6 +195,16 @@ enum class IndicationOutcome { kSuccess, kRejected, kMalformed };
 IndicationOutcome ClassifyListConfigsResult(const ListConfigsResult& result);
 IndicationOutcome ClassifyGetConfigInfoResult(
     const GetConfigInfoResult& result);
+IndicationOutcome ClassifyGetSelectedConfigResult(
+    const GetSelectedConfigResult& result);
+
+// Parses a Get Selected Config indication body, same token-matching
+// contract as the other Parse* functions below. Active Id / Pending Id
+// are each independently optional on the wire (either, both, or neither
+// may be present) - absence means NONE for that field specifically, not
+// a parse failure.
+GetSelectedConfigResult ParseGetSelectedConfigIndication(
+    const uint8_t* buf, size_t len, std::optional<uint32_t> expected_token);
 
 // Parses a List Configs indication body. `expected_token` must match the
 // indication's own Token TLV or the indication is rejected (stale/foreign

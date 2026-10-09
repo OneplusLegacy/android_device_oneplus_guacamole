@@ -9,6 +9,10 @@ include device/oneplus/sm8150-common/BoardConfigCommon.mk
 
 DEVICE_PATH := device/oneplus/guacamole
 
+# Device-specific stable AIDL service consumed by Settings/controller.
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    $(DEVICE_PATH)/vintf/framework_compatibility_matrix.xml
+
 # guacamole_pdc_probe (Phase B) sepolicy - guacamole-only, not shared with
 # sm8150-common siblings. See PHASE_B_FINDINGS.md.
 include $(DEVICE_PATH)/sepolicy/SEPolicy.mk

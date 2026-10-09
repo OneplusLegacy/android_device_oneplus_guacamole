@@ -1,0 +1,7 @@
+# Core-owned init control channel, not a vendor-owned configuration property.
+# Only exact service names in this directory property_contexts use this type.
+system_internal_prop(guacamole_pdc_ctl_prop)
+userdebug_or_eng(`
+  set_prop(su, guacamole_pdc_ctl_prop)
+')
+# No shell/Settings/vendor-domain writer and no generic ctl.start grant.

@@ -1,0 +1,27 @@
+# Debug package only; no trigger starts any service. Permanent journals survive.
+on post-fs-data
+    mkdir /data/vendor/guacamole_efs_experiment 0700 root root
+    restorecon_recursive /data/vendor/guacamole_efs_experiment
+    mkdir /data/vendor/guacamole_efs_reports 0700 root root
+    restorecon_recursive /data/vendor/guacamole_efs_reports
+    # setgid gives newly published 0640 observations the daemon read-only group.
+    mkdir /data/vendor/guacamole_efs_observation 02750 root vendor_guacamole_efsd
+    restorecon_recursive /data/vendor/guacamole_efs_observation
+
+service vendor.guacamole-efs-inspect /vendor/bin/guacamole_efs_experiment inspect-korea-sel-db-readonly
+    disabled
+    oneshot
+    user root
+    group root vendor_qti_diag
+
+service vendor.guacamole-efs-apply-once /vendor/bin/guacamole_efs_experiment apply-korea-sel-db-once --confirm GUACAMOLE_KOREA_SEL_DB_WRITE_EXPERIMENT_V1
+    disabled
+    oneshot
+    user root
+    group root vendor_qti_diag
+
+service vendor.guacamole-efs-rollback-once /vendor/bin/guacamole_efs_experiment rollback-korea-sel-db-once --confirm GUACAMOLE_KOREA_SEL_DB_ROLLBACK_V1
+    disabled
+    oneshot
+    user root
+    group root vendor_qti_diag

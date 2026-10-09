@@ -1,0 +1,27 @@
+# Init-mediated debug experiment. No shell/su/vendor execution transition.
+type guacamole_efs_experiment, domain;
+type guacamole_efs_experiment_exec, exec_type, vendor_file_type, file_type;
+type guacamole_efs_experiment_data_file, file_type, data_file_type;
+type guacamole_efs_reports_file, file_type, data_file_type;
+type guacamole_efs_observation_file, file_type, data_file_type;
+
+userdebug_or_eng(`
+  domain_auto_trans(init, guacamole_efs_experiment_exec, guacamole_efs_experiment)
+  allow guacamole_efs_experiment guacamole_efs_experiment_exec:file { execute execute_no_trans open read getattr map };
+  allow guacamole_efs_experiment self:process { fork sigchld sigkill };
+  allow guacamole_efs_experiment self:fifo_file { read write getattr };
+  allow guacamole_efs_experiment vendor_diag_device:chr_file { read write open ioctl };
+  allow guacamole_efs_experiment self:qipcrtr_socket create_socket_perms_no_ioctl;
+  qmux_socket(guacamole_efs_experiment)
+  allow guacamole_efs_experiment guacamole_pdc_experiment_data_file:dir { search open read getattr };
+  allow guacamole_efs_experiment guacamole_pdc_experiment_data_file:file { open read getattr };
+  allow guacamole_efs_experiment guacamole_efs_experiment_data_file:dir { search open read getattr write add_name };
+  allow guacamole_efs_experiment guacamole_efs_experiment_data_file:file { create open read write getattr lock };
+  allow guacamole_efs_experiment guacamole_efs_reports_file:dir { search open read getattr write add_name };
+  allow guacamole_efs_experiment guacamole_efs_reports_file:file { create open write getattr };
+  # Only the disposable diagnostic cache supports atomic replacement.
+  allow guacamole_efs_experiment guacamole_efs_observation_file:dir { search open read getattr write add_name remove_name };
+  allow guacamole_efs_experiment guacamole_efs_observation_file:file { create open read write getattr setattr rename unlink };
+')
+# Never grant unlink/rename/setattr on either permanent experiment journal.
+# Debug cache is no longer read by production daemon.
