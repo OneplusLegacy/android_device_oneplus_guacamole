@@ -88,6 +88,22 @@ $(call inherit-product, device/oneplus/sm8150-common/common.mk)
 # Inherit from the proprietary files makefile.
 $(call inherit-product, vendor/oneplus/guacamole/guacamole-vendor.mk)
 
+# Stock OnePlus 7 Pro camera, camera service and gallery.
+#
+# Installed to system_ext/priv-app because this tree has no /my_product or
+# /my_bigball partition. The stock camera overrides Aperture and Camera2.
+$(call inherit-product-if-exists, vendor/oplus/camera-guacamole/opluscamera.mk)
+
+# Stock OnePlus 7 Pro Dolby Atmos.
+#
+# vendor.dolby_v3_6.hardware.dms360@2.0 is the 7 Pro interface name; it is not
+# the vendor.dolby.hardware.dms@2.0 the 13T port uses. Set
+# TARGET_ENABLE_ONEPLUS_DOLBY to false to keep the stock audio configuration.
+TARGET_ENABLE_ONEPLUS_DOLBY ?= true
+ifeq ($(TARGET_ENABLE_ONEPLUS_DOLBY),true)
+$(call inherit-product-if-exists, vendor/oneplus/dolby-guacamole/dolby.mk)
+endif
+
 # D1: non-debug production worker and immutable legacy evidence authority.
 PRODUCT_PACKAGES += \
     guacamole_efs_worker \
