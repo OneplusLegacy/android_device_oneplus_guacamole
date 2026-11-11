@@ -14,3 +14,7 @@ vendor.sensors.als_correction.sensor_inverse_gain=1.003141 0.497163 0.28517 0.17
 
 # Bluetooth
 bluetooth.device.default_name=OnePlus 7 Pro
+
+# Display
+# Avoid background-blur composition stalls on the stock Adreno 640 driver.
+ro.surface_flinger.supports_background_blur=0
